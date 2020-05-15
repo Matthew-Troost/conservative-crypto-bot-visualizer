@@ -1,29 +1,9 @@
-# crypto-trading-bot-visualizer
+<h1 align="center">Conservative Crypto Trading Bot - Visualizer</h1>
 
-## Project setup
-```
-npm install
-```
+> An experimental algorithm to trade crypto currency on a minute-to-minute basis.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+<div align="center">
+<img src="src/assets/images/crypto.png" width="250" />
+</div>
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## In progress..
