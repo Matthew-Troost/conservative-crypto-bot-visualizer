@@ -1,5 +1,10 @@
 const functions = require("firebase-functions");
+let trading = require('./trading')
 const axios = require("axios");
+let axios_API = axios.create({
+  baseURL: 'https://conserv-crypto-trading-bot-api.herokuapp.com/',
+  timeout: 1000
+});
 
 exports.test_tick = functions.https.onRequest(async () => {
   //1. Get current BTC value of $1000
@@ -11,14 +16,13 @@ exports.test_tick = functions.https.onRequest(async () => {
       //2. Get auth token by signing in
       const token = await getAPIAuthToken();
 
-      axios.defaults.headers.post['X-Token'] = token
+      axios_API.defaults.headers['X-Token'] = token
 
       //3. Post BTC price to API
       const pricePointId = await createPricePoint('BTC', BTC_value);
       
       //4. Run trading algorithm
-
-      return;
+      return trading.trade(axios_API, pricePointId)
     })
     .catch((error) => {
       // write to error endpoint
@@ -43,8 +47,8 @@ exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
 });
 
 async function getAPIAuthToken() {
-  const signIn_response = await axios.post(
-    "https://conserv-crypto-trading-bot-api.herokuapp.com/graphql",
+  const signIn_response = await axios_API.post(
+    "graphql",
     {
       query: `mutation signIn($login: String!, $password: String!) {
             signIn(login: $login, password: $password){
@@ -62,8 +66,8 @@ async function getAPIAuthToken() {
 }
 
 async function createPricePoint(crypto, value) {
-  const createPricePoint_response = await axios.post(
-    "https://conserv-crypto-trading-bot-api.herokuapp.com/graphql",
+  const createPricePoint_response = await axios_API.post(
+    "graphql",
     {
       query: `mutation createPricePoint($currency: String!, $crypto: String!, $value: Float!) {
             createPricePoint(currency: $currency, crypto: $crypto, value: $value){
