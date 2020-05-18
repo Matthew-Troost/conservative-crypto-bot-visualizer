@@ -1,5 +1,7 @@
 let axios;
 let state;
+const stopLimitPercentage = 1.8;
+const reservePercentage = 1.3;
 
 async function trade(axiosInstance, latestPricePoint) {
   axios = axiosInstance;
@@ -9,13 +11,31 @@ async function trade(axiosInstance, latestPricePoint) {
     case "IDLE":
     case "AWAITING_UPWARD_TREND":
       if (!(await isUpwardTrend())) return;
-      setEntryPoint(latestPricePoint);
+      await enter(latestPricePoint.id);
       break;
 
     case "GAINING":
+      if (latestPricePoint.value < state.entryPricePoint.value) {
+        let percentage =
+          100 - (latestPricePoint.value / state.entryPricePoint.value) * 100;
+        let decrease = Math.round((percentage + Number.EPSILON) * 100) / 100;
+        if (decrease <= stopLimitPercentage) await exit(latestPricePoint.id);
+      } else {
+        let percentage =
+          100 - (state.entryPricePoint.value / latestPricePoint.value) * 100;
+        let increase = Math.round((percentage + Number.EPSILON) * 100) / 100;
+        if (increase >= reservePercentage)
+          await setReservePoint(latestPricePoint.id);
+      }
       break;
 
     case "GAINS_CONTINUING":
+      if (latestPricePoint.value < state.reservePricePoint.value)
+        await exit(latestPricePoint.id);
+      else if (latestPricePoint.value < state.lastDownwardPricePoint.value) {
+        if (state.downwardCount === 2) await exit(latestPricePoint.id);
+        else setDownwardCount(++state.downwardCount);
+      } else setDownwardCount(0);
       break;
   }
 }
@@ -61,6 +81,15 @@ async function getCurrentState() {
       state{
         status
         downwardCount
+        entryPricePoint{
+          value
+        }
+        reservePricePoint{
+          value
+        }
+        lastDownwardPricePoint{
+          value
+        }
       }
     }`,
   });
@@ -80,18 +109,30 @@ function setCurrentStatus(status) {
 }
 
 //buying crypto
-async function setEntryPoint(pricePointId) {
+async function enter(pricePointId) {
+  await axios.post("graphql", {
+    query: `mutation updateState($entryPricePointId: Int!) {
+        updateState(entryPricePointId: $entryPricePointId)
+            }`,
+    variables: {
+      entryPricePointId: pricePointId,
+    },
+  });
+
   await createEvent("BOUGHT IN", pricePointId);
+
   setCurrentStatus("GAINING");
 }
 
 //selling crypto
-function setExitPoint(pricePointId) {
+async function exit(pricePointId) {
+  await createEvent("CASHED OUT", pricePointId);
   setCurrentStatus("AWAITING_UPWARD_TREND");
 }
 
 //reached targeted gains, continuing
-function setReservePoint(pricePointId) {
+async function setReservePoint(pricePointId) {
+  await createEvent("SET RESERVE", pricePointId);
   setCurrentStatus("GAINS_CONTINUING");
 }
 
@@ -108,7 +149,7 @@ function setDownwardCount(value) {
 
 async function createEvent(type, pricepointId) {
   return await axios.post("graphql", {
-    query: `mutation createEvent($type: String!, pricepointId: Int!) {
+    query: `mutation createEvent($type: String!, $pricepointId: Int!) {
       createEvent(type: $type, pricepointId: $pricepointId){
         id
       }
