@@ -5,8 +5,10 @@
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import am4themes_dark from '@amcharts/amcharts4/themes/dark'
 import axios from "axios";
 
+am4core.useTheme(am4themes_dark);
 am4core.useTheme(am4themes_animated);
 
 export default {
@@ -94,6 +96,7 @@ export default {
       series_pricepoints.data = this.data.pricePoints;
       series_pricepoints.tooltipText = "{valueY.value}";
       series_pricepoints.strokeWidth = 2;
+      series_pricepoints.tensionX = 0.77;
 
       var range_tradingBelowReserve = dateAxis.createSeriesRange(
         series_pricepoints

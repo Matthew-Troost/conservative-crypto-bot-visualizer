@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>TEST</h1>
+        <h1 class="center">Conservative Cyrpto Trading Bot</h1>
         <chart/>
     </div>
 </template>

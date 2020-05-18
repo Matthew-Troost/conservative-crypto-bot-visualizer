@@ -31,9 +31,9 @@ exports.test_tick = functions.https.onRequest(async () => {
 
 exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
   return await axios
-    .get("https://blockchain.info/tobtc?currency=USD&value=1000")
+    .get("https://blockchain.info/ticker")
     .then(async (response) => {
-      const BTC_value = response.data;
+      const BTC_value = response.data.USD.buy;
 
       //2. Get auth token by signing in
       const token = await getAPIAuthToken();
