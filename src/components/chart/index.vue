@@ -5,8 +5,9 @@
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import am4themes_dark from '@amcharts/amcharts4/themes/dark'
+import am4themes_dark from "@amcharts/amcharts4/themes/dark";
 import axios from "axios";
+import moment from "moment";
 
 am4core.useTheme(am4themes_dark);
 am4core.useTheme(am4themes_animated);
@@ -54,8 +55,8 @@ export default {
       let response = await axios.post(
         "https://conserv-crypto-trading-bot-api.herokuapp.com/graphql",
         {
-          query: `query {
-               events{
+          query: `query events($minimumDate: String){
+               events(minimumDate: $minimumDate, limit: 100){
                     createdAt
                     type
                     pricePoint{
@@ -63,6 +64,11 @@ export default {
                     }
                 }
         }`,
+          variables: {
+            minimumDate: this.data.pricePoints[
+              this.data.pricePoints.length - 1
+            ].date.toString(),
+          },
         }
       );
 
@@ -72,7 +78,7 @@ export default {
           value: event.pricePoint.value,
           name: event.type,
         };
-      }));
+      })).reverse();
     },
     buildChart() {
       let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
@@ -98,29 +104,26 @@ export default {
       series_pricepoints.strokeWidth = 2;
       series_pricepoints.tensionX = 0.77;
 
-      var range_tradingBelowReserve = dateAxis.createSeriesRange(
-        series_pricepoints
-      );
-      range_tradingBelowReserve.date = new Date("2020-05-18 08:30:00");
-      range_tradingBelowReserve.endDate = new Date("2020-05-18 09:30:00");
-      range_tradingBelowReserve.contents.stroke = am4core.color("#59EA38");
-      range_tradingBelowReserve.contents.fill =
-        range_tradingBelowReserve.contents.stroke;
+      let ranges = [];
 
-      var range_tradingAboveReserve = dateAxis.createSeriesRange(
-        series_pricepoints
-      );
-      range_tradingAboveReserve.date = new Date("2020-05-18 09:45:00");
-      range_tradingAboveReserve.endDate = new Date("2020-05-18 10:00:00");
-      range_tradingAboveReserve.contents.stroke = am4core.color("#D23DFE");
-      range_tradingAboveReserve.contents.fill =
-        range_tradingAboveReserve.contents.stroke;
+      //create ranges
+      this.data.events.forEach((event, index) => {
+        if(event.name != "BOUGHT IN" && event.name != "SET RESERVE") return
+        
+        ranges[index] = dateAxis.createSeriesRange(series_pricepoints);
+        ranges[index].contents.stroke = am4core.color(
+          event.name == "BOUGHT IN" ? "#59EA38" : "#E738EA"
+        );
+        ranges[index].contents.fill = ranges[index].contents.stroke;
+        ranges[index].date = event.date;
 
-      //   let series_events = chart.series.push(new am4charts.LineSeries());
-      //   series_events.dataFields.dateX = "date";
-      //   series_events.dataFields.valueY = "value";
-      //   series_events.data = this.data.events;
-      //   series_events.tooltipText = "{valueY.value}";
+        if (index == this.data.events.length - 1)
+          ranges[index].endDate =
+            moment()
+              .add(3, "hours")
+              .toDate();
+        else ranges[index].endDate = this.data.events[index + 1].date;
+      });
 
       chart.cursor = new am4charts.XYCursor();
 

@@ -34,7 +34,7 @@ async function trade(axiosInstance, latestPricePoint) {
         await exit(latestPricePoint.id);
       else if (latestPricePoint.value < state.lastDownwardPricePoint.value) {
         if (state.downwardCount === 2) await exit(latestPricePoint.id);
-        else setDownwardCount(++state.downwardCount);
+        else setDownwardCount(++state.downwardCount, latestPricePoint.id);
       } else setDownwardCount(0);
       break;
   }
@@ -132,17 +132,26 @@ async function exit(pricePointId) {
 
 //reached targeted gains, continuing
 async function setReservePoint(pricePointId) {
+  await axios.post("graphql", {
+    query: `mutation updateState($reservePricePointId: Int!) {
+        updateState(reservePricePointId: $reservePricePointId)
+            }`,
+    variables: {
+      reservePricePointId: pricePointId,
+    },
+  });
   await createEvent("SET RESERVE", pricePointId);
   setCurrentStatus("GAINS_CONTINUING");
 }
 
-function setDownwardCount(value) {
+function setDownwardCount(value, pricePointId) {
   axios.post("graphql", {
-    query: `mutation updateState($downwardCount: Int!) {
-        updateState(downwardCount: $downwardCount)
+    query: `mutation updateState($downwardCount: Int!, $lastDownwardPricePointId: Int) {
+        updateState(downwardCount: $downwardCount, lastDownwardPricePointId: $lastDownwardPricePointId)
             }`,
     variables: {
       downwardCount: value,
+      lastDownwardPricePointId: pricePointId ?? null
     },
   });
 }
