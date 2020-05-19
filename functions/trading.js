@@ -2,7 +2,7 @@ let axios;
 let state;
 const stopLimitPercentage = 1.8;
 const reservePercentage = 1.3;
-import moment from 'moment'
+const moment = require("moment");
 
 async function trade(axiosInstance, latestPricePoint) {
   axios = axiosInstance;
@@ -15,7 +15,7 @@ async function trade(axiosInstance, latestPricePoint) {
       break;
 
     case "AWAITING_UPWARD_TREND":
-      if(moment(state.lastCashOut) > moment().subtract(5, 'minutes')) return;
+      if (moment(state.lastCashOut) > moment().subtract(5, "minutes")) return;
       if (!(await isUpwardTrend())) return;
       await enter(latestPricePoint.id);
       break;
@@ -25,7 +25,7 @@ async function trade(axiosInstance, latestPricePoint) {
         let percentage =
           100 - (latestPricePoint.value / state.entryPricePoint.value) * 100;
         let decrease = Math.round((percentage + Number.EPSILON) * 100) / 100;
-        if (decrease <= stopLimitPercentage) await exit(latestPricePoint.id);
+        if (decrease >= stopLimitPercentage) await exit(latestPricePoint.id);
       } else {
         let percentage =
           100 - (state.entryPricePoint.value / latestPricePoint.value) * 100;
@@ -166,7 +166,7 @@ function setDownwardCount(value, pricePointId) {
             }`,
     variables: {
       downwardCount: value,
-      lastDownwardPricePointId: pricePointId || null
+      lastDownwardPricePointId: pricePointId || null,
     },
   });
 }

@@ -1,0 +1,19 @@
+subscription onPricePointCreated {
+  pricePointCreated {
+    pricePoint {
+      id
+      createdAt
+      value
+    }
+  }
+}
+
+query getEvents($limit: Int!) {
+  events(limit: $limit) {
+    createdAt
+    type
+    pricePoint {
+      value
+    }
+  }
+}
