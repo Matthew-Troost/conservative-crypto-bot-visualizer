@@ -102,6 +102,7 @@ export default {
       series_pricepoints.data = this.data.pricePoints;
       series_pricepoints.tooltipText = "{valueY.value}";
       series_pricepoints.strokeWidth = 2;
+      series_pricepoints.stroke = am4core.color("grey")
       series_pricepoints.tensionX = 0.77;
 
       let ranges = [];

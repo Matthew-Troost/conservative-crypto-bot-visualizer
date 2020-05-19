@@ -2,6 +2,7 @@ let axios;
 let state;
 const stopLimitPercentage = 1.8;
 const reservePercentage = 1.3;
+import moment from 'moment'
 
 async function trade(axiosInstance, latestPricePoint) {
   axios = axiosInstance;
@@ -9,7 +10,12 @@ async function trade(axiosInstance, latestPricePoint) {
 
   switch (state.status) {
     case "IDLE":
+      if (!(await isUpwardTrend())) return;
+      await enter(latestPricePoint.id);
+      break;
+
     case "AWAITING_UPWARD_TREND":
+      if(moment(state.lastCashOut) > moment().subtract(5, 'minutes')) return;
       if (!(await isUpwardTrend())) return;
       await enter(latestPricePoint.id);
       break;
@@ -90,6 +96,7 @@ async function getCurrentState() {
         lastDownwardPricePoint{
           value
         }
+        lastCashOut
       }
     }`,
   });
@@ -126,6 +133,14 @@ async function enter(pricePointId) {
 
 //selling crypto
 async function exit(pricePointId) {
+  await axios.post("graphql", {
+    query: `mutation updateState($lastCashOut: String!) {
+        updateState(lastCashOut: $lastCashOut)
+            }`,
+    variables: {
+      lastCashOut: new Date().toString(),
+    },
+  });
   await createEvent("CASHED OUT", pricePointId);
   setCurrentStatus("AWAITING_UPWARD_TREND");
 }
@@ -151,7 +166,7 @@ function setDownwardCount(value, pricePointId) {
             }`,
     variables: {
       downwardCount: value,
-      lastDownwardPricePointId: pricePointId ?? null
+      lastDownwardPricePointId: pricePointId || null
     },
   });
 }
