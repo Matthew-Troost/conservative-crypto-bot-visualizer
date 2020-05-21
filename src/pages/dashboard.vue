@@ -13,15 +13,37 @@
         <v-row class="center">
           <v-col cols="12" sm="4"> <v-btn small>Buy In</v-btn> </v-col>
           <v-col cols="12" sm="4"> <v-btn small>Cash Out</v-btn> </v-col>
-          <v-col cols="12" sm="4"> <v-btn small>Set Idle</v-btn> </v-col>
+          <v-col cols="12" sm="4"> <v-btn small>Pause Trading</v-btn> </v-col>
         </v-row>
         <h3>Statistics</h3>
         <v-row>
           <v-col cols="12" sm="6"> </v-col>
           <v-col cols="12" sm="6">
             <div class="card current-price">
-              <p><small>Current price as at {{ pricePoints[0].createdAt | moment("HH:mm:ss") }}</small></p>
+              <p>
+                <small
+                  >Current price as at
+                  {{ pricePoints[0].createdAt | moment("HH:mm:ss") }}</small
+                >
+              </p>
               <p class="current-price__price">$ {{ pricePoints[0].value }}</p>
+            </div>
+            <div class="card current-trend">
+              <p>
+                <small>5-minute regression analysis</small>
+              </p>
+              <small
+                v-for="index in 5"
+                :key="`trend-price-${index}`"
+                :class="
+                  pricePoints[5 - index].value >
+                  pricePoints[5 - index + 1].value
+                    ? 'green'
+                    : 'red'
+                "
+              >
+                {{ pricePoints[5 - index].value }}
+              </small>
             </div>
           </v-col>
         </v-row>
@@ -52,7 +74,7 @@ import {
   getPricePoints,
   onStateUpdated,
   onPricePointCreated,
-  onEventCreated,
+  // onEventCreated,
 } from "../apollo/queries.gql";
 
 export default {
@@ -65,6 +87,12 @@ export default {
       pricePoints: [],
       events: [],
     };
+  },
+  computed: {
+    hasLatestPriceIncreased() {
+      if (!this.pricePoints) return false;
+      return this.pricePoints[0].value > this.pricePoints[1].value;
+    },
   },
   apollo: {
     events: {
@@ -110,12 +138,12 @@ export default {
           this.pricePoints.unshift(data.pricePointCreated.pricePoint);
         },
       },
-      eventCreated: {
-        query: onEventCreated,
-        result({ data }) {
-          this.events.unshift(data.eventCreated.event);
-        },
-      },
+      // eventCreated: {
+      //   query: onEventCreated,
+      //   result({ data }) {
+      //     this.events.unshift(data.eventCreated.event);
+      //   },
+      // },
     },
   },
 };
@@ -155,6 +183,14 @@ export default {
   text-align: right;
   font-size: 20px;
   font-weight: bold;
+}
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
 }
 
 .live-icon {
