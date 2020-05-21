@@ -9,7 +9,11 @@ export default new VueRouter({
         {
             path: '/',
             name: 'Dashboard',
-            component: Dashboard
+            component: Dashboard,
+            meta: {
+                title: 'Dash',
+              }
         }
-    ]
+    ],
+    mode: 'history'
 })
