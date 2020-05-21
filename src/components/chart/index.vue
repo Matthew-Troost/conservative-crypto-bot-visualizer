@@ -6,14 +6,22 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import am4themes_dark from "@amcharts/amcharts4/themes/dark";
-import { onPricePointCreated } from "../../apollo/queries.gql";
-import axios from "axios";
 import moment from "moment";
 
 am4core.useTheme(am4themes_dark);
 am4core.useTheme(am4themes_animated);
 
 export default {
+  props: {
+    pricePoints: {
+      type: Array,
+      default: () => [],
+    },
+    events: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       chart: null,
@@ -23,64 +31,24 @@ export default {
       },
     };
   },
-  async mounted() {
-    await this.getPricePoints();
-    await this.getEvents();
-    this.buildChart();
+  computed: {
+    dataReceived() {
+      return this.pricePoints.length > 0 && this.events.length > 0;
+    },
+  },
+  watch: {
+    dataReceived(ready) {
+      if (ready) {
+        this.data.pricePoints = this.lodash.cloneDeep(this.pricePoints).reverse();
+        this.data.events = this.lodash.cloneDeep(this.events).reverse();
+        this.buildChart();
+      }
+    },
+    pricePoints(value){
+      if(this.chart) this.chart.addData(value[0], 1)
+    }
   },
   methods: {
-    async getPricePoints() {
-      let response = await axios.post(
-        "https://conserv-crypto-trading-bot-api.herokuapp.com/graphql",
-        {
-          query: `query {
-            pricePoints(limit: 180) {
-                createdAt
-                value
-            }
-        }`,
-        }
-      );
-
-      return (this.data.pricePoints = response.data.data.pricePoints.map(
-        (point) => {
-          return {
-            date: new Date(point.createdAt),
-            value: point.value,
-            name: point.value.toString(),
-          };
-        }
-      )).reverse();
-    },
-    async getEvents() {
-      let response = await axios.post(
-        "https://conserv-crypto-trading-bot-api.herokuapp.com/graphql",
-        {
-          query: `query events($minimumDate: String){
-               events(minimumDate: $minimumDate, limit: 100){
-                    createdAt
-                    type
-                    pricePoint{
-                        value
-                    }
-                }
-        }`,
-          variables: {
-            minimumDate: this.data.pricePoints[
-              this.data.pricePoints.length - 1
-            ].date.toString(),
-          },
-        }
-      );
-
-      return (this.data.events = response.data.data.events.map((event) => {
-        return {
-          date: new Date(event.createdAt),
-          value: event.pricePoint.value,
-          name: event.type,
-        };
-      })).reverse();
-    },
     buildChart() {
       let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
 
@@ -98,31 +66,30 @@ export default {
       valueAxis.baseValue = 0;
 
       let series_pricepoints = chart.series.push(new am4charts.LineSeries());
-      series_pricepoints.dataFields.dateX = "date";
+      series_pricepoints.dataFields.dateX = "createdAt";
       series_pricepoints.dataFields.valueY = "value";
       series_pricepoints.tooltipText = "{valueY.value}";
       series_pricepoints.strokeWidth = 2;
       series_pricepoints.stroke = am4core.color("grey");
-      // series_pricepoints.tensionX = 0.77;
 
       let ranges = [];
 
       //create ranges
       this.data.events.forEach((event, index) => {
-        if (event.name != "BOUGHT IN" && event.name != "SET RESERVE") return;
+        if (event.type != "BOUGHT IN" && event.type != "SET RESERVE") return;
 
         ranges[index] = dateAxis.createSeriesRange(series_pricepoints);
         ranges[index].contents.stroke = am4core.color(
-          event.name == "BOUGHT IN" ? "#f4bb1a" : "#59EA38"
+          event.type == "BOUGHT IN" ? "#f4bb1a" : "#59EA38"
         );
         ranges[index].contents.fill = ranges[index].contents.stroke;
-        ranges[index].date = event.date;
+        ranges[index].date = event.createdAt;
 
         if (index == this.data.events.length - 1)
           ranges[index].endDate = moment()
             .add(3, "hours")
             .toDate();
-        else ranges[index].endDate = this.data.events[index + 1].date;
+        else ranges[index].endDate = this.data.events[index + 1].createdAt;
       });
 
       chart.cursor = new am4charts.XYCursor();
@@ -132,25 +99,6 @@ export default {
       chart.scrollbarX = scrollbarX;
 
       this.chart = chart;
-    },
-  },
-  apollo: {
-    $subscribe: {
-      pricePointCreated: {
-        query: onPricePointCreated,
-        result({ data }) {
-          let point = data.pricePointCreated.pricePoint;
-          if (this.chart)
-            this.chart.addData(
-              {
-                date: new Date(point.createdAt),
-                value: point.value,
-                name: point.value.toString(),
-              },
-              1
-            );
-        },
-      },
     },
   },
   beforeDestroy() {

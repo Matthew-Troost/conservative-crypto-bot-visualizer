@@ -7,6 +7,7 @@ import vuetify from './plugins/vuetify';
 import apolloProvider from './plugins/vue-apollo'
 import vueMoment from './plugins/vue-moment'
 import vuescroll from './plugins/vue-scroll'
+import vueLodash from './plugins/vue-lodash'
 
 Vue.config.productionTip = false
 
@@ -17,5 +18,6 @@ new Vue({
   apolloProvider,
   vueMoment,
   vuescroll,
+  vueLodash,
   render: h => h(App)
 }).$mount('#app')

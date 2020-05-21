@@ -8,6 +8,29 @@ subscription onPricePointCreated {
   }
 }
 
+subscription onEventCreated {
+  eventCreated {
+    event {
+      createdAt
+      type
+      pricePoint {
+        value
+      }
+    }
+  }
+}
+
+subscription onStateUpdated {
+  stateUpdated {
+    state {
+      status
+      entryPricePoint {
+        value
+      }
+    }
+  }
+}
+
 query getEvents($limit: Int!) {
   events(limit: $limit) {
     createdAt
@@ -15,5 +38,21 @@ query getEvents($limit: Int!) {
     pricePoint {
       value
     }
+  }
+}
+
+query getState {
+  state {
+    status
+    entryPricePoint {
+      value
+    }
+  }
+}
+
+query getPricePoints($limit: Int!) {
+  pricePoints(limit: $limit) {
+    createdAt
+    value
   }
 }
