@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="center">Conservative Cyrpto Trading Bot</h1>
+    <h1 class="title center">Conservative Cyrpto Trading Bot</h1>
     <div class="live-icon">
       <div class="live-icon__dot"></div>
       <div class="live-icon__pulse"></div>
@@ -43,7 +43,7 @@ export default {
   },
   data() {
     return {
-      events: []
+      events: [],
     };
   },
   apollo: {
@@ -58,6 +58,9 @@ export default {
 </script>
 
 <style scoped>
+.title {
+  margin-bottom: 1em;
+}
 .event-container {
   height: 400px;
 }

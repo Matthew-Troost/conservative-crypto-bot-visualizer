@@ -1,12 +1,23 @@
 <template>
   <div id="app">
     <vue-scroll>
-      <router-view class="router-container"/>
+      <router-view class="router-container" />
+      <div class="footer">
+        A conservative crypto trading bot
+        <img :src="logo" class="footer__logo" />
+      </div>
     </vue-scroll>
   </div>
 </template>
 <script>
+import logo from "./assets/images/crypto.png";
+
 export default {
+  data() {
+    return {
+      logo,
+    };
+  },
   head: {
     title: {
       inner: "Crypto Trading Bot",
@@ -40,5 +51,15 @@ export default {
 }
 .router-container {
   padding: 30px 45px;
+}
+.footer {
+  border-top: 2px solid #797979;
+  margin: 30px 45px;
+  padding-top: 20px;
+}
+.footer__logo {
+  width: 40px;
+  margin-top: -10px;
+  float: right;
 }
 </style>
