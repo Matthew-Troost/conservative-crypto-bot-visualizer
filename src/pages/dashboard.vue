@@ -18,7 +18,7 @@
       <v-col cols="12" sm="4">
         <h3>Events</h3>
         <div class="event-container">
-          <vuescroll :ops="scrollbarOptions">
+          <vue-scroll>
             <div v-for="event in events" :key="event.id" class="event">
               <b>{{ event.type }}</b>
               <span class="event--right">{{ event.pricePoint.value }}</span>
@@ -26,7 +26,7 @@
                 <small>{{ event.createdAt | moment("dddd, HH:mm") }}</small>
               </div>
             </div>
-          </vuescroll>
+          </vue-scroll>
         </div>
       </v-col>
     </v-row>
@@ -35,22 +35,15 @@
 
 <script>
 import chart from "../components/chart";
-import vuescroll from "vuescroll";
 import { getEvents } from "../apollo/queries.gql";
 
 export default {
   components: {
     chart,
-    vuescroll,
   },
   data() {
     return {
-      events: [],
-      scrollbarOptions: {
-        bar:{
-           background: '#c1c1c1',
-        }
-      }
+      events: []
     };
   },
   apollo: {
