@@ -17,14 +17,16 @@
       </v-col>
       <v-col cols="12" sm="4">
         <h3>Events</h3>
-        <div v-for="event in events" :key="event.id" class="event-container">
-          <b>{{ event.type }}</b>
-          <span class="event-container--right">{{
-            event.pricePoint.value
-          }}</span>
-          <div class="event-container__date">
-            <small>{{ event.createdAt | moment("dddd, HH:mm") }}</small>
-          </div>
+        <div class="event-container">
+          <vuescroll :ops="scrollbarOptions">
+            <div v-for="event in events" :key="event.id" class="event">
+              <b>{{ event.type }}</b>
+              <span class="event--right">{{ event.pricePoint.value }}</span>
+              <div class="event__date">
+                <small>{{ event.createdAt | moment("dddd, HH:mm") }}</small>
+              </div>
+            </div>
+          </vuescroll>
         </div>
       </v-col>
     </v-row>
@@ -33,15 +35,22 @@
 
 <script>
 import chart from "../components/chart";
+import vuescroll from "vuescroll";
 import { getEvents } from "../apollo/queries.gql";
 
 export default {
   components: {
     chart,
+    vuescroll,
   },
   data() {
     return {
       events: [],
+      scrollbarOptions: {
+        bar:{
+           background: '#c1c1c1',
+        }
+      }
     };
   },
   apollo: {
@@ -57,17 +66,20 @@ export default {
 
 <style scoped>
 .event-container {
+  height: 400px;
+}
+.event {
   border: 1px solid whitesmoke;
   border-radius: 5px;
   padding: 1em;
-  margin: 0.8em 0;
+  margin: 0 0.8em 10px 0;
 }
 
-.event-container--right {
+.event--right {
   float: right;
 }
 
-.event-container__date {
+.event__date {
   background: #868686;
   color: black;
   padding: 0 1em;
