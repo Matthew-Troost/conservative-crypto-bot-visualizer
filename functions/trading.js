@@ -1,7 +1,7 @@
 let axios;
 let state;
-const stopLimitPercentage = 1.3;
-const reservePercentage = 1.3;
+const stopLimitPercentage = 1;
+const reservePercentage = 1;
 const moment = require("moment");
 
 async function trade(axiosInstance, latestPricePoint) {
