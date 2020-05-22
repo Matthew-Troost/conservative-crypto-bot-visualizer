@@ -1,6 +1,6 @@
 let axios;
 let state;
-const stopLimitPercentage = 1.8;
+const stopLimitPercentage = 1.3;
 const reservePercentage = 1.3;
 const moment = require("moment");
 
@@ -58,27 +58,30 @@ async function isUpwardTrend() {
     },
   });
 
-  let pricePoints = response.data.data.pricePoints;
+  let pricePoints = response.data.data.pricePoints.reverse();
 
   if (pricePoints.length < 5) return false;
 
-  const pricePointMultiplesSum = pricePoints
-    .map((pricePoint, index) => {
-      return pricePoint.value * (index + 1);
-    })
-    .reduce((a, b) => a + b, 0);
+  const y_mean = this.lodash.meanBy(pricePoints, "value");
 
-  const pricePointsSum = pricePoints
-    .map((pricePoint) => {
-      return pricePoint.value;
-    })
-    .reduce((a, b) => a + b, 0);
+  const x_subtract_mean = [-4, -3, -2, -1, 0];
+  const y_subtract_mean = pricePoints.map((point) => {
+    return point.value - y_mean;
+  });
 
-  const regressionSlope =
-    (5 * pricePointMultiplesSum - 15 * pricePointsSum) /
-    (5 * 55 - Math.sqrt(15));
+  const multiples = [];
+  y_subtract_mean.forEach((value, index) =>
+    multiples.push(value * x_subtract_mean[index])
+  );
 
-  return regressionSlope > 0;
+  const squares = [];
+  x_subtract_mean.forEach((value) =>
+    squares.push(Math.sqrt(value < 0 ? value * -1 : value))
+  );
+
+  return (
+    multiples.reduce((a, b) => a + b, 0) / squares.reduce((a, b) => a + b, 0)
+  ) > 0;
 }
 
 async function getCurrentState() {
