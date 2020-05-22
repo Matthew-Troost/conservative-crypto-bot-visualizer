@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1 class="title center">Conservative Cyrpto Trading Bot</h1>
+    <h1 class=" center">Conservative Cyrpto Trading Bot</h1>
+    <h2 class="title center">Bitcoin</h2>
     <div class="live-icon">
       <div class="live-icon__dot"></div>
       <div class="live-icon__pulse"></div>
@@ -17,34 +18,26 @@
         </v-row>
         <h3>Statistics</h3>
         <v-row>
-          <v-col cols="12" sm="6"> </v-col>
           <v-col cols="12" sm="6">
             <div class="card current-price">
-              <p>
-                <small
-                  >Current price as at
-                  {{ pricePoints[0].createdAt | moment("HH:mm:ss") }}</small
-                >
-              </p>
-              <p class="current-price__price">$ {{ pricePoints[0].value }}</p>
+              <v-progress-circular
+                indeterminate
+                color="primary"
+                v-if="$apollo.queries.pricePoints.loading"
+              ></v-progress-circular>
+              <div v-else>
+                <p>
+                  <small
+                    >Current price as at
+                    {{ pricePoints[0].createdAt | moment("HH:mm:ss") }}</small
+                  >
+                </p>
+                <p class="current-price__price">$ {{ pricePoints[0].value }}</p>
+              </div>
             </div>
-            <div class="card current-trend">
-              <p>
-                <small>5-minute regression analysis</small>
-              </p>
-              <small
-                v-for="index in 5"
-                :key="`trend-price-${index}`"
-                :class="
-                  pricePoints[5 - index].value >
-                  pricePoints[5 - index + 1].value
-                    ? 'green'
-                    : 'red'
-                "
-              >
-                {{ pricePoints[5 - index].value }}
-              </small>
-            </div>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <regressionStat :pricePoints="pricePoints.slice(0, 6)" />
           </v-col>
         </v-row>
       </v-col>
@@ -53,7 +46,7 @@
         <div class="event-container">
           <vue-scroll>
             <div v-for="event in events" :key="event.id" class="card event">
-              <b>{{ event.type }}</b>
+              <b :class="event.type == 'SET RESERVE' ? 'light-green' : ''">{{ event.type }}</b>
               <span class="event--right">{{ event.pricePoint.value }}</span>
               <div class="event__date">
                 <small>{{ event.createdAt | moment("dddd, HH:mm") }}</small>
@@ -68,6 +61,7 @@
 
 <script>
 import chart from "../components/chart";
+import regressionStat from '../components/regressionStat';
 import {
   getEvents,
   getState,
@@ -80,6 +74,7 @@ import {
 export default {
   components: {
     chart,
+    regressionStat
   },
   data() {
     return {
@@ -156,12 +151,6 @@ export default {
 .event-container {
   height: 400px;
 }
-.card {
-  border: 1px solid whitesmoke;
-  border-radius: 5px;
-  padding: 1em;
-  margin: 0 0.8em 10px 0;
-}
 
 .event--right {
   float: right;
@@ -183,14 +172,6 @@ export default {
   text-align: right;
   font-size: 20px;
   font-weight: bold;
-}
-
-.green {
-  color: green;
-}
-
-.red {
-  color: red;
 }
 
 .live-icon {
