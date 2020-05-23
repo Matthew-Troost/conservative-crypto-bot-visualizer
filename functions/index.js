@@ -6,28 +6,28 @@ let axios_API = axios.create({
   timeout: 1000,
 });
 
-exports.test_tick = functions.https.onRequest(async () => {
-  //1. Get current BTC value of $1000
-   await axios
-    .get("https://blockchain.info/tobtc?currency=USD&value=1000")
-    .then(async (response) => {
-      const BTC_value = response.data;
+// exports.test_tick = functions.https.onRequest(async () => {
+//   //1. Get current BTC value of $1000
+//    await axios
+//     .get("https://blockchain.info/tobtc?currency=USD&value=1000")
+//     .then(async (response) => {
+//       const BTC_value = response.data;
 
-      //2. Get auth token by signing in
-      const token = await getAPIAuthToken();
+//       //2. Get auth token by signing in
+//       const token = await getAPIAuthToken();
 
-      axios_API.defaults.headers["X-Token"] = token;
+//       axios_API.defaults.headers["X-Token"] = token;
 
-      //3. Post BTC price to API
-      const pricePoint = await createPricePoint("BTC", BTC_value);
+//       //3. Post BTC price to API
+//       const pricePoint = await createPricePoint("BTC", BTC_value);
 
-      //4. Run trading algorithm
-      return await trading.trade(axios_API, pricePoint);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-});
+//       //4. Run trading algorithm
+//       return await trading.trade(axios_API, pricePoint);
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//     });
+// });
 
 exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
   return await axios

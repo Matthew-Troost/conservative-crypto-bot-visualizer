@@ -20,6 +20,10 @@ h2 {
   text-align: right;
 }
 
+.f-right {
+   float: right;
+  }
+
 .green {
   color: green;
 }

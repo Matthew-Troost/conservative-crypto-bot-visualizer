@@ -79,9 +79,14 @@ async function isUpwardTrend() {
     squares.push(Math.sqrt(value < 0 ? value * -1 : value))
   );
 
-  return (
+  console.log(
     multiples.reduce((a, b) => a + b, 0) / squares.reduce((a, b) => a + b, 0)
-  ) > 0;
+  );
+
+  return (
+    multiples.reduce((a, b) => a + b, 0) / squares.reduce((a, b) => a + b, 0) >
+    0
+  );
 }
 
 async function getCurrentState() {

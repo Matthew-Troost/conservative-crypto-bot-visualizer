@@ -8,7 +8,7 @@
       <small class="live-icon__text"><b>LIVE</b></small>
     </div>
     <chart ref="chart" :pricePoints="pricePoints" :events="events" />
-    <v-row no-gutters class="data">
+    <v-row class="data">
       <v-col cols="12" sm="8">
         <h3>Controls</h3>
         <v-row class="center">
@@ -19,22 +19,8 @@
         <h3>Statistics</h3>
         <v-row>
           <v-col cols="12" sm="6">
-            <div class="card current-price">
-              <v-progress-circular
-                indeterminate
-                color="primary"
-                v-if="$apollo.queries.pricePoints.loading"
-              ></v-progress-circular>
-              <div v-else>
-                <p>
-                  <small
-                    >Current price as at
-                    {{ pricePoints[0].createdAt | moment("HH:mm:ss") }}</small
-                  >
-                </p>
-                <p class="current-price__price">$ {{ pricePoints[0].value }}</p>
-              </div>
-            </div>
+            <statusStat :state="state" />
+            <priceStat :pricePoint="pricePoints[0]" />
           </v-col>
           <v-col cols="12" sm="6">
             <regressionStat :pricePoints="pricePoints.slice(0, 6)" />
@@ -61,7 +47,9 @@
 
 <script>
 import chart from "../components/chart";
-import regressionStat from '../components/regressionStat';
+import regressionStat from '../components/stats/regression';
+import priceStat from '../components/stats/price'
+import statusStat from '../components/stats/status'
 import {
   getEvents,
   getState,
@@ -74,7 +62,9 @@ import {
 export default {
   components: {
     chart,
-    regressionStat
+    regressionStat,
+    priceStat,
+    statusStat
   },
   data() {
     return {
@@ -93,7 +83,7 @@ export default {
     events: {
       query: getEvents,
       variables: {
-        limit: 100,
+        limit: 10,
       },
       update: (data) => {
         data.events.forEach(
@@ -166,12 +156,6 @@ export default {
 }
 .data {
   margin-top: 15px;
-}
-
-.current-price__price {
-  text-align: right;
-  font-size: 20px;
-  font-weight: bold;
 }
 
 .live-icon {
