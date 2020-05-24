@@ -3,6 +3,7 @@ let state;
 const stopLimitPercentage = 1;
 const reservePercentage = 1;
 const moment = require("moment");
+const lodash = require("lodash");
 
 async function trade(axiosInstance, latestPricePoint) {
   axios = axiosInstance;
@@ -62,7 +63,7 @@ async function isUpwardTrend() {
 
   if (pricePoints.length < 5) return false;
 
-  const y_mean = this.lodash.meanBy(pricePoints, "value");
+  const y_mean = lodash.meanBy(pricePoints, "value");
 
   const x_subtract_mean = [-4, -3, -2, -1, 0];
   const y_subtract_mean = pricePoints.map((point) => {
@@ -79,12 +80,8 @@ async function isUpwardTrend() {
     squares.push(Math.sqrt(value < 0 ? value * -1 : value))
   );
 
-  console.log(
-    multiples.reduce((a, b) => a + b, 0) / squares.reduce((a, b) => a + b, 0)
-  );
-
   return (
-    multiples.reduce((a, b) => a + b, 0) / squares.reduce((a, b) => a + b, 0) >
+    lodash.sum(multiples) / lodash.sum(squares) >
     0
   );
 }

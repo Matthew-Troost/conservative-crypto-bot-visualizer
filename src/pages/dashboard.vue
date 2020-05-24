@@ -12,10 +12,59 @@
       <v-col cols="12" sm="8">
         <h3>Controls</h3>
         <v-row class="center">
-          <v-col cols="12" sm="4"> <v-btn small>Buy In</v-btn> </v-col>
-          <v-col cols="12" sm="4"> <v-btn small>Cash Out</v-btn> </v-col>
-          <v-col cols="12" sm="4"> <v-btn small>Pause Trading</v-btn> </v-col>
+          <v-col cols="12" sm="4">
+            <v-btn
+              small
+              :disabled="
+                !state ||
+                  (state.status != 'IDLE' &&
+                    state.status != 'AWAITING_UPWARD_TREND')
+              "
+              >Buy In</v-btn
+            >
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-btn
+              small
+              :disabled="
+                !state ||
+                  (state.status != 'GAINING' &&
+                    state.status != 'GAINS_CONTINUING')
+              "
+              >Cash Out</v-btn
+            >
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-btn small
+              >{{
+                state.status == "PAUSED" ? "Resume" : "Pause"
+              }}
+              Trading</v-btn
+            >
+          </v-col>
         </v-row>
+        <v-tabs v-model="tab" background-color="primary" dark>
+          <v-tab>
+            Statistics
+          </v-tab>
+             <v-tab>
+            COntrols
+          </v-tab>
+        </v-tabs>
+
+        <v-tabs-items v-model="tab">
+          <v-tab-item >
+            <v-card flat>
+              <v-card-text>test</v-card-text>
+            </v-card>
+          </v-tab-item>
+           <v-tab-item >
+            <v-card flat>
+              <v-card-text>test 2</v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+
         <h3>Statistics</h3>
         <v-row>
           <v-col cols="12" sm="6">
@@ -32,7 +81,9 @@
         <div class="event-container">
           <vue-scroll>
             <div v-for="event in events" :key="event.id" class="card event">
-              <b :class="event.type == 'SET RESERVE' ? 'light-green' : ''">{{ event.type }}</b>
+              <b :class="event.type == 'SET RESERVE' ? 'light-green' : ''">{{
+                event.type
+              }}</b>
               <span class="event--right">{{ event.pricePoint.value }}</span>
               <div class="event__date">
                 <small>{{ event.createdAt | moment("dddd, HH:mm") }}</small>
@@ -47,9 +98,9 @@
 
 <script>
 import chart from "../components/chart";
-import regressionStat from '../components/stats/regression';
-import priceStat from '../components/stats/price'
-import statusStat from '../components/stats/status'
+import regressionStat from "../components/stats/regression";
+import priceStat from "../components/stats/price";
+import statusStat from "../components/stats/status";
 import {
   getEvents,
   getState,
@@ -64,13 +115,14 @@ export default {
     chart,
     regressionStat,
     priceStat,
-    statusStat
+    statusStat,
   },
   data() {
     return {
       state: null,
       pricePoints: [],
       events: [],
+      tab: null
     };
   },
   computed: {
