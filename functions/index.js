@@ -54,6 +54,10 @@ exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
 exports.cleanup = functions.pubsub
   .schedule("every 24 hours")
   .onRun(async () => {
+    const token = await getAPIAuthToken();
+
+    axios_API.defaults.headers["X-Token"] = token;
+
     return await deleteOldPricePoints();
   });
 
