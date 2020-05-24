@@ -51,6 +51,12 @@ exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
     });
 });
 
+exports.cleanup = functions.pubsub
+  .schedule("every 24 hours")
+  .onRun(async () => {
+    return await deleteOldPricePoints();
+  });
+
 async function getAPIAuthToken() {
   const signIn_response = await axios_API.post("graphql", {
     query: `mutation signIn($login: String!, $password: String!) {
@@ -85,4 +91,14 @@ async function createPricePoint(crypto, value) {
     id: parseInt(createPricePoint_response.data.data.createPricePoint.id),
     value,
   };
+}
+
+async function deleteOldPricePoints() {
+  const deleteOldPricePoints_response = await axios_API.post("graphql", {
+    query: `mutation {
+              deleteOldPricePoints
+            }`,
+  });
+
+  return deleteOldPricePoints_response.data.data.deleteOldPricePoints;
 }
