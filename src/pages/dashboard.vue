@@ -37,7 +37,7 @@
           <v-col cols="12" sm="4">
             <v-btn small
               >{{
-                state.status == "PAUSED" ? "Resume" : "Pause"
+                (!state || state.status == "PAUSED") ? "Resume" : "Pause"
               }}
               Trading</v-btn
             >
@@ -70,6 +70,7 @@
           <v-col cols="12" sm="6">
             <statusStat :state="state" />
             <priceStat :pricePoint="pricePoints[0]" />
+            <marginStat :latestPricePoint="pricePoints[0]" :state="state" />
           </v-col>
           <v-col cols="12" sm="6">
             <regressionStat :pricePoints="pricePoints.slice(0, 6)" />
@@ -90,13 +91,14 @@ import regressionStat from "../components/stats/regression";
 import priceStat from "../components/stats/price";
 import statusStat from "../components/stats/status";
 import eventsStat from "../components/stats/events"
+import marginStat from "../components/stats/margin"
 import {
   getEvents,
   getState,
   getPricePoints,
   onStateUpdated,
   onPricePointCreated,
-  // onEventCreated,
+  onEventCreated,
 } from "../apollo/queries.gql";
 
 export default {
@@ -105,7 +107,8 @@ export default {
     regressionStat,
     priceStat,
     statusStat,
-    eventsStat
+    eventsStat,
+    marginStat
   },
   data() {
     return {
@@ -165,12 +168,13 @@ export default {
           this.pricePoints.unshift(data.pricePointCreated.pricePoint);
         },
       },
-      // eventCreated: {
-      //   query: onEventCreated,
-      //   result({ data }) {
-      //     this.events.unshift(data.eventCreated.event);
-      //   },
-      // },
+      eventCreated: {
+        query: onEventCreated,
+        result({ data }) {
+          this.events.unshift(data.eventCreated.event);
+          //rerender graph 
+        },
+      },
     },
   },
 };
