@@ -1,5 +1,5 @@
 <template>
-  <div class="hello" ref="chartdiv"></div>
+  <div class="chart" ref="chartdiv"></div>
 </template>
 <script>
 import * as am4core from "@amcharts/amcharts4/core";
@@ -94,10 +94,6 @@ export default {
 
       chart.cursor = new am4charts.XYCursor();
 
-      let scrollbarX = new am4charts.XYChartScrollbar();
-      scrollbarX.series.push(series_pricepoints);
-      chart.scrollbarX = scrollbarX;
-
       this.chart = chart;
     },
   },
@@ -109,8 +105,9 @@ export default {
 };
 </script>
 <style scoped>
-.hello {
+.chart {
   width: 100%;
   height: 400px;
+  padding-top: 1em;
 }
 </style>

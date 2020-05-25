@@ -43,7 +43,7 @@
             >
           </v-col>
         </v-row>
-        <v-tabs v-model="tab" background-color="primary" dark>
+        <!-- <v-tabs v-model="tab" background-color="primary" dark>
           <v-tab>
             Statistics
           </v-tab>
@@ -63,7 +63,7 @@
               <v-card-text>test 2</v-card-text>
             </v-card>
           </v-tab-item>
-        </v-tabs-items>
+        </v-tabs-items> -->
 
         <h3>Statistics</h3>
         <v-row>
@@ -190,6 +190,8 @@ export default {
 
 .live-icon {
   position: relative;
+  float: right;
+  right: 60px;
 }
 .live-icon__text {
   margin-left: 25px;

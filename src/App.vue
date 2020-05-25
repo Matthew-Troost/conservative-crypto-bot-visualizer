@@ -3,7 +3,7 @@
     <vue-scroll>
       <router-view class="router-container" />
       <div class="footer">
-        A conservative crypto trading bot
+        A conservative crypto trading bot | Matthew Troost
         <img :src="logo" class="footer__logo" />
       </div>
     </vue-scroll>
