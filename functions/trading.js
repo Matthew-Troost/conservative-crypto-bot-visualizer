@@ -37,12 +37,13 @@ async function trade(axiosInstance, latestPricePoint) {
       break;
 
     case "GAINS_CONTINUING":
-      if (latestPricePoint.value < state.reservePricePoint.value)
+      if (latestPricePoint.value < state.reservePricePoint.value) {
         await exit(latestPricePoint.id);
-      else if (latestPricePoint.value < state.lastDownwardPricePoint.value) {
+        await setDownwardCount(0);
+      } else if (latestPricePoint.value < state.lastDownwardPricePoint.value) {
         if (state.downwardCount === 2) await exit(latestPricePoint.id);
-        else setDownwardCount(++state.downwardCount, latestPricePoint.id);
-      } else setDownwardCount(0);
+        else await setDownwardCount(++state.downwardCount, latestPricePoint.id);
+      } else await setDownwardCount(0, latestPricePoint.id);
       break;
   }
 }
@@ -80,10 +81,7 @@ async function isUpwardTrend() {
     squares.push(Math.sqrt(value < 0 ? value * -1 : value))
   );
 
-  return (
-    lodash.sum(multiples) / lodash.sum(squares) >
-    0
-  );
+  return lodash.sum(multiples) / lodash.sum(squares) > 0;
 }
 
 async function getCurrentState() {
@@ -153,21 +151,28 @@ async function exit(pricePointId) {
 //reached targeted gains, continuing
 async function setReservePoint(pricePointId) {
   await axios.post("graphql", {
-    query: `mutation updateState($reservePricePointId: Int!) {
-        updateState(reservePricePointId: $reservePricePointId)
+    query: `mutation updateState($reservePricePointId: Int!, $lastDownwardPricePointId: Int) {
+        updateState(reservePricePointId: $reservePricePointId, lastDownwardPricePointId: $lastDownwardPricePointId)
             }`,
     variables: {
       reservePricePointId: pricePointId,
+      lastDownwardPricePointId: pricePointId,
     },
   });
   await createEvent("SET RESERVE", pricePointId);
   await setCurrentStatus("GAINS_CONTINUING");
 }
 
-function setDownwardCount(value, pricePointId) {
-  axios.post("graphql", {
-    query: `mutation updateState($downwardCount: Int!, $lastDownwardPricePointId: Int) {
-        updateState(downwardCount: $downwardCount, lastDownwardPricePointId: $lastDownwardPricePointId)
+async function setDownwardCount(value, pricePointId) {
+  await axios.post("graphql", {
+    query: `mutation updateState($downwardCount: Int! ${
+      pricePointId ? ", $lastDownwardPricePointId: Int" : ""
+    }) {
+        updateState(downwardCount: $downwardCount ${
+          pricePointId
+            ? ", lastDownwardPricePointId: $lastDownwardPricePointId"
+            : ""
+        })
             }`,
     variables: {
       downwardCount: value,
