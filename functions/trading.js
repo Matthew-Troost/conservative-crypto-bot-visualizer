@@ -16,7 +16,7 @@ async function trade(axiosInstance, latestPricePoint) {
       break;
 
     case "AWAITING_UPWARD_TREND":
-      if (moment(state.lastCashOut) > moment().subtract(5, "minutes")) return;
+      // if (moment(state.lastCashOut) > moment().subtract(5, "minutes")) return;
       if (!(await isUpwardTrend())) return;
       await enter(latestPricePoint.id);
       break;
