@@ -21,16 +21,16 @@ h2 {
 }
 
 .f-right {
-   float: right;
-  }
+  float: right;
+}
 
 .green {
   color: green;
 }
 
 .light-green {
-    color: #59EA38;
-  }
+  color: #59ea38;
+}
 
 .red {
   color: red;
@@ -41,4 +41,9 @@ h2 {
   border-radius: 5px;
   padding: 1em;
   margin: 0 0.8em 10px 0;
+}
+
+.progress-circle--center {
+  margin: auto;
+  width: 100% !important;
 }

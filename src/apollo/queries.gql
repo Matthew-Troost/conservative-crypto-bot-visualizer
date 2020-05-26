@@ -24,7 +24,11 @@ subscription onStateUpdated {
   stateUpdated {
     state {
       status
+      downwardCount
       entryPricePoint {
+        value
+      }
+      lastDownwardPricePoint {
         value
       }
     }
@@ -44,7 +48,11 @@ query getEvents($limit: Int!) {
 query getState {
   state {
     status
+    downwardCount
     entryPricePoint {
+      value
+    }
+    lastDownwardPricePoint {
       value
     }
   }

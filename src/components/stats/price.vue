@@ -2,6 +2,7 @@
   <div class="card current-price">
     <v-progress-circular
       indeterminate
+      class="progress-circle--center"
       color="primary"
       v-if="!pricePoint"
     ></v-progress-circular>

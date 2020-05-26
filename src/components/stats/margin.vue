@@ -2,6 +2,7 @@
   <div class="card current-margin">
     <v-progress-circular
       indeterminate
+      class="progress-circle--center"
       color="primary"
       v-if="!state || !latestPricePoint"
     ></v-progress-circular>
@@ -11,7 +12,9 @@
       </p>
       <p
         :class="
-          `right current-margin__margin ${percentage > 0 ? 'green' : 'red'}`
+          `right current-margin__margin ${
+            percentage == 0 ? '' : percentage > 0 ? 'green' : 'red'
+          }`
         "
       >
         {{ percentage }}%

@@ -69,10 +69,11 @@
         <v-row>
           <v-col cols="12" sm="6">
             <statusStat :state="state" />
-            <priceStat :pricePoint="pricePoints[0]" />
             <marginStat :latestPricePoint="pricePoints[0]" :state="state" />
+            <reverveMonitor v-if="state && state.status == 'GAINS_CONTINUING'" :state="state" />
           </v-col>
           <v-col cols="12" sm="6">
+            <priceStat :pricePoint="pricePoints[0]" />
             <regressionStat :pricePoints="pricePoints.slice(0, 6)" />
           </v-col>
         </v-row>
@@ -92,6 +93,7 @@ import priceStat from "../components/stats/price";
 import statusStat from "../components/stats/status";
 import eventsStat from "../components/stats/events"
 import marginStat from "../components/stats/margin"
+import reverveMonitor from "../components/stats/reserveMonitor"
 import {
   getEvents,
   getState,
@@ -108,7 +110,8 @@ export default {
     priceStat,
     statusStat,
     eventsStat,
-    marginStat
+    marginStat,
+    reverveMonitor
   },
   data() {
     return {
