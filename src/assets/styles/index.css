@@ -47,3 +47,19 @@ h2 {
   margin: auto;
   width: 100% !important;
 }
+
+.tabs--transparent.v-tabs > .v-tabs-bar,
+.tabs--transparent.v-tabs-items,
+.tabs--transparent .v-card {
+  background-color: transparent;
+}
+
+.tabs--transparent.v-tabs > .v-tabs-bar .v-tab:not(.v-tab--active) {
+  color: white;
+}
+
+.v-tab {
+  font-size: 1.17em;
+  font-weight: bold;
+  text-transform: none;
+}

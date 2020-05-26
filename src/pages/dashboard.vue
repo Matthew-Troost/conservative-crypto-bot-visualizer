@@ -10,7 +10,7 @@
     <chart ref="chart" :pricePoints="pricePoints" :events="events" />
     <v-row class="data">
       <v-col cols="12" sm="8">
-        <h3>Controls</h3>
+        <h3>Quick Actions</h3>
         <v-row class="center">
           <v-col cols="12" sm="4">
             <v-btn
@@ -35,48 +35,46 @@
             >
           </v-col>
           <v-col cols="12" sm="4">
-            <v-btn small
+            <v-btn small @click="test()"
               >{{
-                (!state || state.status == "PAUSED") ? "Resume" : "Pause"
+                !state || state.status == "PAUSED" ? "Resume" : "Pause"
               }}
               Trading</v-btn
             >
           </v-col>
         </v-row>
-        <!-- <v-tabs v-model="tab" background-color="primary" dark>
+        <v-tabs v-model="tab" class="tabs--transparent">
           <v-tab>
             Statistics
           </v-tab>
-             <v-tab>
-            COntrols
+          <v-tab>
+            Controls
           </v-tab>
         </v-tabs>
 
-        <v-tabs-items v-model="tab">
-          <v-tab-item >
-            <v-card flat>
-              <v-card-text>test</v-card-text>
-            </v-card>
+        <v-tabs-items v-model="tab" class="tabs--transparent">
+          <v-tab-item>
+            <v-row>
+              <v-col cols="12" sm="6">
+                <statusStat :state="state" />
+                <marginStat :latestPricePoint="pricePoints[0]" :state="state" />
+                <reverveMonitor
+                  v-if="state && state.status == 'GAINS_CONTINUING'"
+                  :state="state"
+                />
+              </v-col>
+              <v-col cols="12" sm="6">
+                <priceStat :pricePoint="pricePoints[0]" />
+                <regressionStat :pricePoints="pricePoints.slice(0, 6)" />
+              </v-col>
+            </v-row>
           </v-tab-item>
-           <v-tab-item >
+          <v-tab-item>
             <v-card flat>
               <v-card-text>test 2</v-card-text>
             </v-card>
           </v-tab-item>
-        </v-tabs-items> -->
-
-        <h3>Statistics</h3>
-        <v-row>
-          <v-col cols="12" sm="6">
-            <statusStat :state="state" />
-            <marginStat :latestPricePoint="pricePoints[0]" :state="state" />
-            <reverveMonitor v-if="state && state.status == 'GAINS_CONTINUING'" :state="state" />
-          </v-col>
-          <v-col cols="12" sm="6">
-            <priceStat :pricePoint="pricePoints[0]" />
-            <regressionStat :pricePoints="pricePoints.slice(0, 6)" />
-          </v-col>
-        </v-row>
+        </v-tabs-items>
       </v-col>
       <v-col cols="12" sm="4">
         <h3>Events</h3>
@@ -91,9 +89,9 @@ import chart from "../components/chart";
 import regressionStat from "../components/stats/regression";
 import priceStat from "../components/stats/price";
 import statusStat from "../components/stats/status";
-import eventsStat from "../components/stats/events"
-import marginStat from "../components/stats/margin"
-import reverveMonitor from "../components/stats/reserveMonitor"
+import eventsStat from "../components/stats/events";
+import marginStat from "../components/stats/margin";
+import reverveMonitor from "../components/stats/reserveMonitor";
 import {
   getEvents,
   getState,
@@ -111,14 +109,14 @@ export default {
     statusStat,
     eventsStat,
     marginStat,
-    reverveMonitor
+    reverveMonitor,
   },
   data() {
     return {
       state: null,
       pricePoints: [],
       events: [],
-      tab: null
+      tab: null,
     };
   },
   computed: {
@@ -175,9 +173,14 @@ export default {
         query: onEventCreated,
         result({ data }) {
           this.events.unshift(data.eventCreated.event);
-          //rerender graph 
+          this.$refs.chart.updateEvents();
         },
       },
+    },
+  },
+  methods: {
+    test() {
+      this.$refs.chart.updateEvents();
     },
   },
 };

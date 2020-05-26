@@ -39,14 +39,16 @@ export default {
   watch: {
     dataReceived(ready) {
       if (ready) {
-        this.data.pricePoints = this.lodash.cloneDeep(this.pricePoints).reverse();
+        this.data.pricePoints = this.lodash
+          .cloneDeep(this.pricePoints)
+          .reverse();
         this.data.events = this.lodash.cloneDeep(this.events).reverse();
         this.buildChart();
       }
     },
-    pricePoints(value){
-      if(this.chart) this.chart.addData(value[0], 1)
-    }
+    pricePoints(value) {
+      if (this.chart) this.chart.addData(value[0], 1);
+    },
   },
   methods: {
     buildChart() {
@@ -95,6 +97,10 @@ export default {
       chart.cursor = new am4charts.XYCursor();
 
       this.chart = chart;
+    },
+    updateEvents() {
+      console.log(this.chart)
+      this.chart.invalidateData();
     },
   },
   beforeDestroy() {
