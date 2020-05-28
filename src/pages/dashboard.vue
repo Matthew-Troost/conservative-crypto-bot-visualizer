@@ -110,11 +110,13 @@ export default {
       pricePoints: [],
       events: [],
       tab: null,
-      lunoAccount: null,
+      lunoAccounts: null,
     };
   },
   created() {
-    this.lunoAccount = this.getBalances();
+    this.getBalances().then(accounts => {
+      this.lunoAccounts = accounts
+    });
   },
   computed: {
     hasLatestPriceIncreased() {
