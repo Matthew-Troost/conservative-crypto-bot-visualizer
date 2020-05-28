@@ -63,3 +63,17 @@ h2 {
   font-weight: bold;
   text-transform: none;
 }
+
+.input--white.v-input input {
+  color: white;
+}
+
+.input--white.v-text-field > .v-input__control > .v-input__slot:before,
+.input--white.v-text-field:not(.v-input--has-state):hover > .v-input__control > .v-input__slot:before,
+.v-text-field > .v-input__control > .v-input__slot:after {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.input--white.v-label{
+  color: rgba(255, 255, 255, 0.32);
+}

@@ -50,6 +50,9 @@
           <v-tab>
             Account
           </v-tab>
+          <v-tab>
+            Settings
+          </v-tab>
         </v-tabs>
 
         <v-tabs-items v-model="tab" class="tabs--transparent">
@@ -72,6 +75,9 @@
           <v-tab-item>
             account
           </v-tab-item>
+          <v-tab-item>
+            <profile />
+          </v-tab-item>
         </v-tabs-items>
       </v-col>
       <v-col cols="12" sm="4">
@@ -84,12 +90,8 @@
 
 <script>
 import chart from "../components/chart";
-import regressionStat from "../components/stats/regression";
-import priceStat from "../components/stats/price";
-import statusStat from "../components/stats/status";
-import eventsStat from "../components/stats/events";
-import marginStat from "../components/stats/margin";
-import reverveMonitor from "../components/stats/reserveMonitor";
+import * as stats from "../components/stats";
+import profile from "../components/profile";
 import {
   getEvents,
   getState,
@@ -103,17 +105,14 @@ import luno_functions from "../mixins/luno";
 export default {
   components: {
     chart,
-    regressionStat,
-    priceStat,
-    statusStat,
-    eventsStat,
-    marginStat,
-    reverveMonitor,
+    ...stats,
+    profile,
   },
   mixins: [luno_functions],
   data() {
     return {
       state: null,
+      profile: null,
       pricePoints: [],
       events: [],
       tab: null,
@@ -121,7 +120,7 @@ export default {
     };
   },
   created() {
-   // this.lunoAccount = this.getBalances();
+    // this.lunoAccount = this.getBalances();
   },
   computed: {
     hasLatestPriceIncreased() {
