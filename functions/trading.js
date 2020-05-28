@@ -1,13 +1,14 @@
 let axios;
 let state;
+let profile;
 const stopLimitPercentage = 1;
 const reservePercentage = 1;
-const moment = require("moment");
 const lodash = require("lodash");
 
 async function trade(axiosInstance, latestPricePoint) {
   axios = axiosInstance;
   await getCurrentState();
+  await getProfile();
 
   switch (state.status) {
     case "IDLE":
@@ -129,6 +130,19 @@ async function enter(pricePointId) {
     },
   });
 
+  await axios.post("graphql", {
+    query: `mutation createEntry($value: Float!, $pricepointId: Int!, $profileId: Int!) {
+      createEntry(value: $value, pricepointId: $pricepointId, profileId: $profileId){
+        id
+      }
+            }`,
+    variables: {
+      value: profile.tradeInput, //TODO: check if this is available in luno wallet
+      pricepointId: pricePointId,
+      profileId: profile.id,
+    },
+  });
+
   await createEvent("BOUGHT IN", pricePointId);
 
   await setCurrentStatus("GAINING");
@@ -144,7 +158,22 @@ async function exit(pricePointId) {
       lastCashOut: new Date().toString(),
     },
   });
+
+  const lastEntryId = await getLastEntry();
+  await axios.post("graphql", {
+    query: `mutation createExit($enterId: Int!, $pricepointId: Int!) {
+      createExit(enterId: $enterId, pricepointId: $pricepointId){
+        id
+      }
+            }`,
+    variables: {
+      enterId: lastEntryId,
+      pricepointId: pricePointId
+    },
+  });
+
   await createEvent("CASHED OUT", pricePointId);
+
   await setCurrentStatus("AWAITING_UPWARD_TREND");
 }
 
@@ -193,6 +222,34 @@ async function createEvent(type, pricepointId) {
       pricepointId,
     },
   });
+}
+
+async function getProfile() {
+  const response = await axios.post("graphql", {
+    query: `query{
+      profiles{
+        id
+        stopLimitPercentage
+        reservePercentage
+        maximumLossesPerDay
+        tradeInput
+      }
+    }`,
+  });
+
+  profile = response.data.data.profiles[0];
+}
+
+async function getLastEntry() {
+  const response = await axios.post("graphql", {
+    query: `query{
+      entries(limit: 1){
+        id
+      }
+    }`,
+  });
+
+  return response.data.data.entries[0];
 }
 
 module.exports = { trade };
