@@ -60,13 +60,14 @@
             <v-row>
               <v-col cols="12" sm="6">
                 <statusStat :state="state" />
-                <marginStat :latestPricePoint="pricePoints[0]" :state="state" />
+                <marginStat v-if="state && state.status != 'AWAITING_UPWARD_TREND'" :latestPricePoint="pricePoints[0]" :state="state" />
                 <reverveMonitor
                   v-if="state && state.status == 'GAINS_CONTINUING'"
                   :state="state"
                 />
               </v-col>
               <v-col cols="12" sm="6">
+                <currentTime />
                 <priceStat :pricePoint="pricePoints[0]" />
                 <regressionStat :pricePoints="pricePoints.slice(0, 6)" />
               </v-col>
@@ -76,7 +77,7 @@
             account
           </v-tab-item>
           <v-tab-item>
-            <profile />
+            <!-- <profile :profile="profiles || profiles[0]" /> -->
           </v-tab-item>
         </v-tabs-items>
       </v-col>
@@ -91,28 +92,21 @@
 <script>
 import chart from "../components/chart";
 import * as stats from "../components/stats";
-import profile from "../components/profile";
-import {
-  getEvents,
-  getState,
-  getPricePoints,
-  onStateUpdated,
-  onPricePointCreated,
-  onEventCreated,
-} from "../apollo/queries.gql";
+// import profile from "../components/profile";
+import queries from "../apollo/queries.gql";
 import luno_functions from "../mixins/luno";
 
 export default {
   components: {
     chart,
     ...stats,
-    profile,
+    // profile,
   },
   mixins: [luno_functions],
   data() {
     return {
       state: null,
-      profile: null,
+      profiles: null,
       pricePoints: [],
       events: [],
       tab: null,
@@ -120,7 +114,7 @@ export default {
     };
   },
   created() {
-    // this.lunoAccount = this.getBalances();
+    this.lunoAccount = this.getBalances();
   },
   computed: {
     hasLatestPriceIncreased() {
@@ -130,7 +124,7 @@ export default {
   },
   apollo: {
     events: {
-      query: getEvents,
+      query: queries.getEvents,
       variables: {
         limit: 10,
       },
@@ -142,7 +136,7 @@ export default {
       },
     },
     pricePoints: {
-      query: getPricePoints,
+      query: queries.getPricePoints,
       variables: {
         limit: 180,
       },
@@ -154,17 +148,20 @@ export default {
       },
     },
     state: {
-      query: getState,
+      query: queries.getState,
+    },
+    profiles: {
+      query: queries.getProfiles,
     },
     $subscribe: {
       stateUpdated: {
-        query: onStateUpdated,
+        query: queries.onStateUpdated,
         result({ data }) {
           this.state = data.stateUpdated.state;
         },
       },
       pricePointCreated: {
-        query: onPricePointCreated,
+        query: queries.onPricePointCreated,
         result({ data }) {
           data.pricePointCreated.pricePoint.createdAt = new Date(
             data.pricePointCreated.pricePoint.createdAt
@@ -173,7 +170,7 @@ export default {
         },
       },
       eventCreated: {
-        query: onEventCreated,
+        query: queries.onEventCreated,
         result({ data }) {
           this.events.unshift(data.eventCreated.event);
           this.$refs.chart.updateEvents();

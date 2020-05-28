@@ -4,6 +4,7 @@ import statusStat from "./status";
 import eventsStat from "./events";
 import marginStat from "./margin";
 import reverveMonitor from "./reserveMonitor";
+import currentTime from "./currentTime"
 
 export {
   regressionStat,
@@ -12,4 +13,5 @@ export {
   eventsStat,
   marginStat,
   reverveMonitor,
+  currentTime
 };

@@ -159,7 +159,7 @@ async function exit(pricePointId) {
     },
   });
 
-  const lastEntryId = await getLastEntry();
+  const lastEntry = await getLastEntry();
   await axios.post("graphql", {
     query: `mutation createExit($enterId: Int!, $pricepointId: Int!) {
       createExit(enterId: $enterId, pricepointId: $pricepointId){
@@ -167,8 +167,8 @@ async function exit(pricePointId) {
       }
             }`,
     variables: {
-      enterId: lastEntryId,
-      pricepointId: pricePointId
+      enterId: lastEntry.id,
+      pricepointId: pricePointId,
     },
   });
 
@@ -237,7 +237,15 @@ async function getProfile() {
     }`,
   });
 
-  profile = response.data.data.profiles[0];
+  let result = response.data.data.profiles[0];
+
+  profile = {
+    id: parseInt(result.id),
+    stopLimitPercentage: parseFloat(result.stopLimitPercentage),
+    reservePercentage: parseFloat(result.reservePercentage),
+    maximumLossesPerDay: parseInt(result.maximumLossesPerDay),
+    tradeInput: parseFloat(result.tradeInput),
+  };
 }
 
 async function getLastEntry() {
@@ -249,7 +257,9 @@ async function getLastEntry() {
     }`,
   });
 
-  return response.data.data.entries[0];
+  let lastEntry = response.data.data.entries[0];
+  lastEntry.id = parseInt(lastEntry.id);
+  return lastEntry;
 }
 
 module.exports = { trade };

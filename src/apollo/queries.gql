@@ -64,3 +64,13 @@ query getPricePoints($limit: Int!) {
     value
   }
 }
+
+query getProfiles {
+  profiles{
+    id
+    stopLimitPercentage
+    reservePercentage
+    maximumLossesPerDay
+    tradeInput
+  }
+}

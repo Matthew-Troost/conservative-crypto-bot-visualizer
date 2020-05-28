@@ -34,5 +34,20 @@ export default {
       default: null,
     },
   },
+  data(){
+    return {
+      profileModel: {}
+    }
+  },
+  computed:{
+    profileProxy:{
+      get(){
+
+      },
+      set(value){
+profileModel
+      }
+    }
+  }
 };
 </script>
