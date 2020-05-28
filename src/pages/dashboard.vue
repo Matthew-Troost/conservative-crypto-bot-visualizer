@@ -48,7 +48,7 @@
             Statistics
           </v-tab>
           <v-tab>
-            Controls
+            Account
           </v-tab>
         </v-tabs>
 
@@ -70,9 +70,7 @@
             </v-row>
           </v-tab-item>
           <v-tab-item>
-            <v-card flat>
-              <v-card-text>test 2</v-card-text>
-            </v-card>
+            account
           </v-tab-item>
         </v-tabs-items>
       </v-col>
@@ -100,6 +98,7 @@ import {
   onPricePointCreated,
   onEventCreated,
 } from "../apollo/queries.gql";
+import luno_functions from "../mixins/luno";
 
 export default {
   components: {
@@ -111,13 +110,18 @@ export default {
     marginStat,
     reverveMonitor,
   },
+  mixins: [luno_functions],
   data() {
     return {
       state: null,
       pricePoints: [],
       events: [],
       tab: null,
+      lunoAccount: null,
     };
+  },
+  created() {
+   // this.lunoAccount = this.getBalances();
   },
   computed: {
     hasLatestPriceIncreased() {

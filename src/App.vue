@@ -5,17 +5,22 @@
       <div class="footer">
         A conservative crypto trading bot | Matthew Troost
         <img :src="logo" class="footer__logo" />
+        <br />
+        <span>Trading via
+        <a href="https://www.luno.com/"><img :src="luno_logo" class="footer__lunologo"/></a></span>
       </div>
     </vue-scroll>
   </div>
 </template>
 <script>
 import logo from "./assets/images/crypto.png";
+import luno_logo from "./assets/images/luno-logo.png";
 
 export default {
   data() {
     return {
       logo,
+      luno_logo,
     };
   },
   head: {
@@ -59,7 +64,9 @@ export default {
 }
 .footer__logo {
   width: 40px;
-  margin-top: -10px;
   float: right;
+}
+.footer__lunologo{
+  width: 50px;
 }
 </style>
