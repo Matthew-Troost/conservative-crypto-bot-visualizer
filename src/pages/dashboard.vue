@@ -48,7 +48,7 @@
             Statistics
           </v-tab>
           <v-tab>
-            Account
+            Accounts
           </v-tab>
           <v-tab>
             Settings
@@ -60,7 +60,11 @@
             <v-row>
               <v-col cols="12" sm="6">
                 <statusStat :state="state" />
-                <marginStat v-if="state && state.status != 'AWAITING_UPWARD_TREND'" :latestPricePoint="pricePoints[0]" :state="state" />
+                <marginStat
+                  v-if="state && state.status != 'AWAITING_UPWARD_TREND'"
+                  :latestPricePoint="pricePoints[0]"
+                  :state="state"
+                />
                 <reverveMonitor
                   v-if="state && state.status == 'GAINS_CONTINUING'"
                   :state="state"
@@ -74,7 +78,17 @@
             </v-row>
           </v-tab-item>
           <v-tab-item>
-            account
+            <v-btn small @click="getAccounts()">Refresh</v-btn>
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+                v-for="(account, index) in lunoAccounts"
+                :key="account.id"
+              >
+                <account v-model="lunoAccounts[index]" />
+              </v-col>
+            </v-row>
           </v-tab-item>
           <v-tab-item>
             <!-- <profile :profile="profiles || profiles[0]" /> -->
@@ -92,7 +106,7 @@
 <script>
 import chart from "../components/chart";
 import * as stats from "../components/stats";
-// import profile from "../components/profile";
+import account from "../components/account";
 import queries from "../apollo/queries.gql";
 import luno_functions from "../mixins/luno";
 
@@ -100,7 +114,7 @@ export default {
   components: {
     chart,
     ...stats,
-    // profile,
+    account,
   },
   mixins: [luno_functions],
   data() {
@@ -110,13 +124,11 @@ export default {
       pricePoints: [],
       events: [],
       tab: null,
-      lunoAccounts: null,
+      lunoAccounts: [],
     };
   },
   created() {
-    this.getBalances().then(accounts => {
-      this.lunoAccounts = accounts
-    });
+    this.getAccounts()
   },
   computed: {
     hasLatestPriceIncreased() {
@@ -181,8 +193,11 @@ export default {
     },
   },
   methods: {
-    test() {
-      this.$refs.chart.updateEvents();
+    getAccounts() {
+      this.lunoAccounts = []
+      this.getBalances().then((accounts) => {
+        this.lunoAccounts = accounts;
+      });
     },
   },
 };
