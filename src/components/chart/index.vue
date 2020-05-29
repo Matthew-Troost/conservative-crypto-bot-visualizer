@@ -21,6 +21,14 @@ export default {
       type: Array,
       default: () => [],
     },
+    latestEntryPoint: {
+      type: Object,
+      default: null,
+    },
+    profile: {
+      type: Object,
+      default: null,
+    },
   },
   data() {
     return {
@@ -33,7 +41,11 @@ export default {
   },
   computed: {
     dataReceived() {
-      return this.pricePoints.length > 0 && this.events.length > 0;
+      return (
+        this.pricePoints.length > 0 &&
+        this.events.length > 0 &&
+        this.latestEntryPoint
+      );
     },
   },
   watch: {
@@ -63,9 +75,33 @@ export default {
       };
       dateAxis.tooltipDateFormat = "HH:mm, d MMMM";
       dateAxis.renderer.grid.template.location = 0;
-
+      
       let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
       valueAxis.baseValue = 0;
+      valueAxis.renderer.grid.template.disabled = true
+
+      let entryPointLine = valueAxis.axisRanges.create();
+      entryPointLine.value = this.latestEntryPoint.value;
+      entryPointLine.grid.stroke = am4core.color("#396478");
+      entryPointLine.grid.strokeWidth = 2;
+      entryPointLine.grid.strokeOpacity = 0.3;
+
+      let marginLine = valueAxis.axisRanges.create();
+      marginLine.value =
+        this.latestEntryPoint.value * (this.profile.reservePercentage / 100) +
+        this.latestEntryPoint.value;
+      marginLine.grid.stroke = am4core.color("green");
+      marginLine.grid.strokeWidth = 2;
+      marginLine.grid.strokeOpacity = 0.3;
+
+      let exitLine = valueAxis.axisRanges.create();
+      exitLine.value =
+        this.latestEntryPoint.value -
+        this.latestEntryPoint.value *
+          ((this.profile.stopLimitPercentage / 100) * -1);
+      exitLine.grid.stroke = am4core.color("red");
+      exitLine.grid.strokeWidth = 2;
+      exitLine.grid.strokeOpacity = 0.3;
 
       let series_pricepoints = chart.series.push(new am4charts.LineSeries());
       series_pricepoints.dataFields.dateX = "createdAt";
@@ -99,7 +135,7 @@ export default {
       this.chart = chart;
     },
     updateEvents() {
-      console.log(this.chart)
+      console.log(this.chart);
       this.chart.invalidateData();
     },
   },

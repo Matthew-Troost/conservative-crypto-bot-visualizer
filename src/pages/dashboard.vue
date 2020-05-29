@@ -7,7 +7,7 @@
       <div class="live-icon__pulse"></div>
       <small class="live-icon__text"><b>LIVE</b></small>
     </div>
-    <chart ref="chart" :pricePoints="pricePoints" :events="events" />
+    <chart ref="chart" :pricePoints="pricePoints" :events="events" :latestEntryPoint="state && state.entryPricePoint" :profile="profiles[0]"/>
     <v-row class="data">
       <v-col cols="12" sm="8">
         <h3>Quick Actions</h3>
