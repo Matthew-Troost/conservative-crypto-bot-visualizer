@@ -40,7 +40,7 @@ h2 {
   border: 1px solid whitesmoke;
   border-radius: 5px;
   padding: 1em;
-  margin: 0 0.8em 10px 0;
+  margin: 10px 0;
 }
 
 .progress-circle--center {
@@ -69,11 +69,27 @@ h2 {
 }
 
 .input--white.v-text-field > .v-input__control > .v-input__slot:before,
-.input--white.v-text-field:not(.v-input--has-state):hover > .v-input__control > .v-input__slot:before,
+.input--white.v-text-field:not(.v-input--has-state):hover
+  > .v-input__control
+  > .v-input__slot:before,
 .v-text-field > .v-input__control > .v-input__slot:after {
   border-color: rgba(255, 255, 255, 0.32);
 }
 
-.input--white.v-label{
+.input--white.v-label {
   color: rgba(255, 255, 255, 0.32);
+}
+
+th.text-start {
+  text-align: left;
+}
+
+.v-chip.green{
+  background: green !important;
+  color: white;
+}
+
+.v-chip.red{
+  background: red !important;
+  color: white;
 }

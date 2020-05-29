@@ -29,11 +29,26 @@ query getPricePoints($limit: Int!) {
 }
 
 query getProfiles {
-  profiles{
+  profiles {
     id
     stopLimitPercentage
     reservePercentage
     maximumLossesPerDay
     tradeInput
+  }
+}
+
+query getExits {
+  exits {
+    createdAt
+    pricePoint {
+      value
+    }
+    entry {
+      value
+      pricePoint {
+        value
+      }
+    }
   }
 }

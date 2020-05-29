@@ -89,7 +89,8 @@
                 <account v-model="lunoAccounts[index]" />
               </v-col>
             </v-row>
-            <p>Trades over the last 24 hours</p>
+            <p>Recent trades</p>
+            <exits v-model="exits" />
           </v-tab-item>
           <v-tab-item>
             <!-- <profile :profile="profiles || profiles[0]" /> -->
@@ -108,6 +109,7 @@
 import chart from "../components/chart";
 import * as stats from "../components/stats";
 import account from "../components/account";
+import exits from "../components/exits";
 import queries from "../apollo/queries.gql";
 import subscriptions from "../apollo/subscriptions.gql";
 import luno_functions from "../mixins/luno";
@@ -117,6 +119,7 @@ export default {
     chart,
     ...stats,
     account,
+    exits,
   },
   mixins: [luno_functions],
   data() {
@@ -127,10 +130,11 @@ export default {
       events: [],
       tab: null,
       lunoAccounts: [],
+      exits: [],
     };
   },
   created() {
-    this.getAccounts()
+    this.getAccounts();
   },
   computed: {
     hasLatestPriceIncreased() {
@@ -169,6 +173,9 @@ export default {
     profiles: {
       query: queries.getProfiles,
     },
+    exits: {
+      query: queries.getExits,
+    },
     $subscribe: {
       stateUpdated: {
         query: subscriptions.onStateUpdated,
@@ -196,7 +203,7 @@ export default {
   },
   methods: {
     getAccounts() {
-      this.lunoAccounts = []
+      this.lunoAccounts = [];
       this.getBalances().then((accounts) => {
         this.lunoAccounts = accounts;
       });
