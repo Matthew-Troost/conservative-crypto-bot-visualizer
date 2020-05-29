@@ -32,6 +32,7 @@ export default {
         { text: "BTC Entry Price", align: "start", value: "entryPrice" },
         { text: "BTC Exit Price", align: "start", value: "exitPrice" },
         { text: "Margin", align: "start", value: "margin" },
+        { text: "Traded", align: "start", value: "entryAmount" },
         { text: "Gain", align: "start", value: "gain" },
       ],
     };

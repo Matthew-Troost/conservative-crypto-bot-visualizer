@@ -34,3 +34,20 @@ subscription onStateUpdated {
     }
   }
 }
+
+subscription onExitCreated {
+  exitCreated {
+    exit {
+      createdAt
+      pricePoint {
+        value
+      }
+      entry {
+        value
+        pricePoint {
+          value
+        }
+      }
+    }
+  }
+}

@@ -199,6 +199,12 @@ export default {
           this.$refs.chart.updateEvents();
         },
       },
+      exitCreated: {
+        query: subscriptions.onExitCreated,
+        result({ data }) {
+          this.exits.unshift(data.exitCreated.exit);
+        },
+      },
     },
   },
   methods: {
