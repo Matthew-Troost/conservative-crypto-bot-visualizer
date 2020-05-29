@@ -89,6 +89,7 @@
                 <account v-model="lunoAccounts[index]" />
               </v-col>
             </v-row>
+            <p>Trades over the last 24 hours</p>
           </v-tab-item>
           <v-tab-item>
             <!-- <profile :profile="profiles || profiles[0]" /> -->
@@ -108,6 +109,7 @@ import chart from "../components/chart";
 import * as stats from "../components/stats";
 import account from "../components/account";
 import queries from "../apollo/queries.gql";
+import subscriptions from "../apollo/subscriptions.gql";
 import luno_functions from "../mixins/luno";
 
 export default {
@@ -169,13 +171,13 @@ export default {
     },
     $subscribe: {
       stateUpdated: {
-        query: queries.onStateUpdated,
+        query: subscriptions.onStateUpdated,
         result({ data }) {
           this.state = data.stateUpdated.state;
         },
       },
       pricePointCreated: {
-        query: queries.onPricePointCreated,
+        query: subscriptions.onPricePointCreated,
         result({ data }) {
           data.pricePointCreated.pricePoint.createdAt = new Date(
             data.pricePointCreated.pricePoint.createdAt
@@ -184,7 +186,7 @@ export default {
         },
       },
       eventCreated: {
-        query: queries.onEventCreated,
+        query: subscriptions.onEventCreated,
         result({ data }) {
           this.events.unshift(data.eventCreated.event);
           this.$refs.chart.updateEvents();

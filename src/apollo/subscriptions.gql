@@ -1,0 +1,36 @@
+subscription onPricePointCreated {
+  pricePointCreated {
+    pricePoint {
+      id
+      createdAt
+      value
+    }
+  }
+}
+
+subscription onEventCreated {
+  eventCreated {
+    event {
+      createdAt
+      type
+      pricePoint {
+        value
+      }
+    }
+  }
+}
+
+subscription onStateUpdated {
+  stateUpdated {
+    state {
+      status
+      downwardCount
+      entryPricePoint {
+        value
+      }
+      lastDownwardPricePoint {
+        value
+      }
+    }
+  }
+}
