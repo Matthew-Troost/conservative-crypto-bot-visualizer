@@ -11,6 +11,18 @@ const httpLink = createHttpLink({
   uri: 'https://conserv-crypto-trading-bot-api.herokuapp.com/graphql',
 })
 
+// const authLink = setContext((_, { headers }) => {
+//   // get the authentication token from local storage if it exists
+//   const token = localStorage.getItem('token');
+//   // return the headers to the context so httpLink can read them
+//   return {
+//     headers: {
+//       ...headers,
+//       authorization: token ? `Bearer ${token}` : "",
+//     }
+//   }
+// });
+
 const wsLink = new WebSocketLink({
   uri: 'ws://conserv-crypto-trading-bot-api.herokuapp.com/graphql',
   options: {

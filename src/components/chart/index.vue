@@ -43,8 +43,7 @@ export default {
     dataReceived() {
       return (
         this.pricePoints.length > 0 &&
-        this.events.length > 0 &&
-        this.latestEntryPoint
+        this.events.length > 0
       );
     },
   },
@@ -90,8 +89,8 @@ export default {
       marginLine.value =
         this.latestEntryPoint.value * (this.profile.reservePercentage / 100) +
         this.latestEntryPoint.value;
-      marginLine.grid.stroke = am4core.color("green");
-      marginLine.grid.strokeWidth = 2;
+      marginLine.grid.stroke = am4core.color("#396478");
+      marginLine.grid.strokeWidth = 1;
       marginLine.grid.strokeOpacity = 0.3;
 
       let exitLine = valueAxis.axisRanges.create();
@@ -99,8 +98,8 @@ export default {
         this.latestEntryPoint.value -
         this.latestEntryPoint.value *
           ((this.profile.stopLimitPercentage / 100) * -1);
-      exitLine.grid.stroke = am4core.color("red");
-      exitLine.grid.strokeWidth = 2;
+      exitLine.grid.stroke = am4core.color("#396478");
+      exitLine.grid.strokeWidth = 1;
       exitLine.grid.strokeOpacity = 0.3;
 
       let series_pricepoints = chart.series.push(new am4charts.LineSeries());

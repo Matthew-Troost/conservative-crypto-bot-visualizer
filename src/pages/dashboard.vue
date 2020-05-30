@@ -7,7 +7,14 @@
       <div class="live-icon__pulse"></div>
       <small class="live-icon__text"><b>LIVE</b></small>
     </div>
-    <chart ref="chart" :pricePoints="pricePoints" :events="events" :latestEntryPoint="state && state.entryPricePoint" :profile="profiles[0]"/>
+    <chart
+      ref="chart"
+      v-if="state && profiles"
+      :pricePoints="pricePoints"
+      :events="events"
+      :latestEntryPoint="state.entryPricePoint"
+      :profile="profiles[0]"
+    />
     <v-row class="data">
       <v-col cols="12" sm="8">
         <h3>Quick Actions</h3>
@@ -62,7 +69,7 @@
                 <statusStat :state="state" />
                 <marginStat
                   v-if="state && state.status != 'AWAITING_UPWARD_TREND'"
-                  :latestPricePoint="pricePoints[0]"
+                  :latestPricePoint="pricePoints && pricePoints[0]"
                   :state="state"
                 />
                 <reverveMonitor
@@ -72,7 +79,7 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <currentTime />
-                <priceStat :pricePoint="pricePoints[0]" />
+                <priceStat :pricePoint="pricePoints && pricePoints[0]" />
                 <regressionStat :pricePoints="pricePoints.slice(0, 6)" />
               </v-col>
             </v-row>
@@ -93,7 +100,7 @@
             <exits v-model="exits" />
           </v-tab-item>
           <v-tab-item>
-            <!-- <profile :profile="profiles || profiles[0]" /> -->
+            <profile v-if="profiles" v-model="profiles[0]" />
           </v-tab-item>
         </v-tabs-items>
       </v-col>
@@ -110,6 +117,7 @@ import chart from "../components/chart";
 import * as stats from "../components/stats";
 import account from "../components/account";
 import exits from "../components/exits";
+import profile from "../components/profile";
 import queries from "../apollo/queries.gql";
 import subscriptions from "../apollo/subscriptions.gql";
 import luno_functions from "../mixins/luno";
@@ -120,6 +128,7 @@ export default {
     ...stats,
     account,
     exits,
+    profile,
   },
   mixins: [luno_functions],
   data() {
@@ -195,6 +204,7 @@ export default {
       eventCreated: {
         query: subscriptions.onEventCreated,
         result({ data }) {
+          if (!data.eventCreated) return;
           this.events.unshift(data.eventCreated.event);
           this.$refs.chart.updateEvents();
         },
@@ -202,6 +212,7 @@ export default {
       exitCreated: {
         query: subscriptions.onExitCreated,
         result({ data }) {
+          if (!data.exitCreated) return;
           this.exits.unshift(data.exitCreated.exit);
         },
       },
@@ -209,7 +220,6 @@ export default {
   },
   methods: {
     getAccounts() {
-      this.lunoAccounts = [];
       this.getBalances().then((accounts) => {
         this.lunoAccounts = accounts;
       });

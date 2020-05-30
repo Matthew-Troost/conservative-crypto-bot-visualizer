@@ -1,0 +1,14 @@
+mutation updateProfile(
+    $id: Int!, 
+    $stopLimitPercentage: Float, 
+    $reservePercentage: Float, 
+    $maximumLossesPerDay: Int, 
+    $tradeInput: Float) 
+    {
+  updateProfile(
+      id: $id, 
+      stopLimitPercentage: $stopLimitPercentage, 
+      reservePercentage: $reservePercentage, 
+      maximumLossesPerDay: $maximumLossesPerDay, 
+      tradeInput: $tradeInput)
+}
