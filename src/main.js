@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from "./vuex"
 import head from './plugins/vue-head'
 import './assets/styles/index.css'
 import vuetify from './plugins/vuetify';
@@ -17,6 +18,7 @@ new Vue({
   vuetify,
   apolloProvider,
   vueMoment,
+  store,
   vuescroll,
   vueLodash,
   render: h => h(App)

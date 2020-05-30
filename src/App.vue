@@ -16,26 +16,34 @@
         <v-dialog v-model="signin_dialog" max-width="290">
           <v-card>
             <v-card-title class="headline">Access</v-card-title>
-            <v-card-text>
-              <v-text-field label="Username" v-model="username"></v-text-field>
-              <v-text-field
-                label="Password"
-                type="password"
-                v-model="password"
-              ></v-text-field>
+            <v-card-text v-if="signedIn">
+              Already signed in.
             </v-card-text>
+            <div v-else>
+              <v-card-text>
+                <v-text-field
+                  label="Username"
+                  v-model="username"
+                ></v-text-field>
+                <v-text-field
+                  label="Password"
+                  type="password"
+                  v-model="password"
+                ></v-text-field>
+              </v-card-text>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
+              <v-card-actions>
+                <v-spacer></v-spacer>
 
-              <v-btn text @click="signin_dialog = false">
-                Cancel
-              </v-btn>
+                <v-btn text @click="signin_dialog = false">
+                  Cancel
+                </v-btn>
 
-              <v-btn text @click="signIn()" :disabled="loading">
-                Sign In
-              </v-btn>
-            </v-card-actions>
+                <v-btn text @click="signIn()" :disabled="loading">
+                  Sign In
+                </v-btn>
+              </v-card-actions>
+            </div>
           </v-card>
         </v-dialog>
       </v-app>
@@ -83,6 +91,11 @@ export default {
       { rel: "manifest", href: "/site.webmanifest" },
     ],
   },
+  computed: {
+    signedIn() {
+      return this.$store.getters.signedIn;
+    },
+  },
   methods: {
     signIn() {
       this.loading = true;
@@ -96,6 +109,7 @@ export default {
         })
         .then((result) => {
           sessionStorage.setItem("apollo-token", result.data.signIn.token);
+          this.$store.dispatch("signIn", result.data.signIn.token);
           this.signin_dialog = false;
           this.loading = false;
         })
