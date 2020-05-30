@@ -43,8 +43,13 @@ exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
       //3. Post BTC price to API
       const pricePoint = await createPricePoint("BTC", BTC_value);
 
-      //4. Run trading algorithm
-      return await trading.trade(axios_API, pricePoint);
+      //4. Get all profiles
+      const profiles = await getProfiles();
+
+      //5. Run trading algorithm
+      return profiles.forEach(
+        async (profile) => await trading.trade(axios_API, pricePoint, profile)
+      );
     })
     .catch((error) => {
       console.log(error.response);
@@ -75,6 +80,22 @@ async function getAPIAuthToken() {
   });
 
   return signIn_response.data.data.signIn.token;
+}
+
+async function getProfiles() {
+  const profiles_response = await axios_API.post("graphql", {
+    query: `query{
+      profiles {
+        id
+        stopLimitPercentage
+        reservePercentage
+        maximumLossesPerDay
+        tradeInput
+      }
+    }`,
+  });
+
+  return profiles_response.data.data.profiles;
 }
 
 async function createPricePoint(crypto, value) {

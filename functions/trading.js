@@ -1,25 +1,21 @@
 let axios;
 let state;
-let profile;
-const stopLimitPercentage = 1;
-const reservePercentage = 1;
 const lodash = require("lodash");
 
-async function trade(axiosInstance, latestPricePoint) {
+async function trade(axiosInstance, latestPricePoint, profile) {
   axios = axiosInstance;
   await getCurrentState();
-  await getProfile();
 
   switch (state.status) {
     case "IDLE":
       if (!(await isUpwardTrend())) return;
-      await enter(latestPricePoint.id);
+      await enter(latestPricePoint.id, profile);
       break;
 
     case "AWAITING_UPWARD_TREND":
       // if (moment(state.lastCashOut) > moment().subtract(5, "minutes")) return;
       if (!(await isUpwardTrend())) return;
-      await enter(latestPricePoint.id);
+      await enter(latestPricePoint.id, profile);
       break;
 
     case "GAINING":
@@ -27,12 +23,12 @@ async function trade(axiosInstance, latestPricePoint) {
         let percentage =
           100 - (latestPricePoint.value / state.entryPricePoint.value) * 100;
         let decrease = Math.round((percentage + Number.EPSILON) * 100) / 100;
-        if (decrease >= stopLimitPercentage) await exit(latestPricePoint.id);
+        if (decrease >= (profile.stopLimitPercentage * -1)) await exit(latestPricePoint.id);
       } else {
         let percentage =
           100 - (state.entryPricePoint.value / latestPricePoint.value) * 100;
         let increase = Math.round((percentage + Number.EPSILON) * 100) / 100;
-        if (increase >= reservePercentage)
+        if (increase >= profile.reservePercentage)
           await setReservePoint(latestPricePoint.id);
       }
       break;
@@ -120,7 +116,7 @@ async function setCurrentStatus(status) {
 }
 
 //buying crypto
-async function enter(pricePointId) {
+async function enter(pricePointId, profile) {
   await axios.post("graphql", {
     query: `mutation updateState($entryPricePointId: Int!) {
         updateState(entryPricePointId: $entryPricePointId)
@@ -222,30 +218,6 @@ async function createEvent(type, pricepointId) {
       pricepointId,
     },
   });
-}
-
-async function getProfile() {
-  const response = await axios.post("graphql", {
-    query: `query{
-      profiles{
-        id
-        stopLimitPercentage
-        reservePercentage
-        maximumLossesPerDay
-        tradeInput
-      }
-    }`,
-  });
-
-  let result = response.data.data.profiles[0];
-
-  profile = {
-    id: parseInt(result.id),
-    stopLimitPercentage: parseFloat(result.stopLimitPercentage),
-    reservePercentage: parseFloat(result.reservePercentage),
-    maximumLossesPerDay: parseInt(result.maximumLossesPerDay),
-    tradeInput: parseFloat(result.tradeInput),
-  };
 }
 
 async function getLastEntry() {
