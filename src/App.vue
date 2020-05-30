@@ -1,26 +1,61 @@
 <template>
-  <div id="app">
+  <div class="app">
     <vue-scroll>
       <router-view class="router-container" />
       <div class="footer">
         A conservative crypto trading bot | Matthew Troost
-        <img :src="logo" class="footer__logo" />
+        <img :src="logo" class="footer__logo" @click="signin_dialog = true" />
         <br />
-        <span>Trading via
-        <a href="https://www.luno.com/"><img :src="luno_logo" class="footer__lunologo"/></a></span>
+        <span
+          >Trading via
+          <a href="https://www.luno.com/"
+            ><img :src="luno_logo" class="footer__lunologo"/></a
+        ></span>
       </div>
+      <v-app>
+        <v-dialog v-model="signin_dialog" max-width="290">
+          <v-card>
+            <v-card-title class="headline">Access</v-card-title>
+            <v-card-text>
+              <v-text-field label="Username" v-model="username"></v-text-field>
+              <v-text-field
+                label="Password"
+                type="password"
+                v-model="password"
+              ></v-text-field>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+
+              <v-btn text @click="signin_dialog = false">
+                Cancel
+              </v-btn>
+
+              <v-btn text @click="signIn()" :disabled="loading">
+                Sign In
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-app>
     </vue-scroll>
   </div>
 </template>
 <script>
 import logo from "./assets/images/crypto.png";
 import luno_logo from "./assets/images/luno-logo.png";
+import { signIn } from "./apollo/mutations.gql";
 
 export default {
   data() {
     return {
       logo,
       luno_logo,
+      signin_dialog: false,
+      loading: false,
+      username: "",
+      password: "",
     };
   },
   head: {
@@ -48,10 +83,33 @@ export default {
       { rel: "manifest", href: "/site.webmanifest" },
     ],
   },
+  methods: {
+    signIn() {
+      this.loading = true;
+      this.$apollo
+        .mutate({
+          mutation: signIn,
+          variables: {
+            login: this.username,
+            password: this.password,
+          },
+        })
+        .then((result) => {
+          sessionStorage.setItem("apollo-token", result.data.signIn.token);
+          this.signin_dialog = false;
+          this.loading = false;
+        })
+        .catch(() => {
+          this.username = "";
+          this.password = "";
+          this.loading = false;
+        });
+    },
+  },
 };
 </script>
 <style scoped>
-#app {
+.app {
   height: 100vh;
 }
 .router-container {
@@ -66,7 +124,11 @@ export default {
   width: 40px;
   float: right;
 }
-.footer__lunologo{
+.footer__logo:hover {
+  cursor: pointer;
+}
+
+.footer__lunologo {
   width: 50px;
 }
 </style>

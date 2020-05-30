@@ -48,7 +48,7 @@
   </div>
 </template>
 <script>
-import mutations from "../../apollo/mutations.gql";
+import { updateProfile } from "../../apollo/mutations.gql";
 
 export default {
   props: {
@@ -67,16 +67,26 @@ export default {
   },
   methods: {
     updateProfile() {
-      this.$apollo.mutate({
-        mutation: mutations.updateProfile,
-        variables: {
-          id: parseInt(this.profile.id),
-          stopLimitPercentage: this.profile.stopLimitPercentage,
-          reservePercentage: this.profile.reservePercentage,
-          maximumLossesPerDay: this.profile.maximumLossesPerDay,
-          tradeInput: this.profile.tradeInput,
-        },
-      }).catch(error => console.log(error))
+      console.log({
+            id: parseInt(this.profile.id),
+            stopLimitPercentage: this.profile.stopLimitPercentage,
+            reservePercentage: this.profile.reservePercentage,
+            maximumLossesPerDay: this.profile.maximumLossesPerDay,
+            tradeInput: this.profile.tradeInput,
+          });
+
+      this.$apollo
+        .mutate({
+          mutation: updateProfile,
+          variables: {
+            id: parseInt(this.profile.id),
+            stopLimitPercentage: this.profile.stopLimitPercentage,
+            reservePercentage: this.profile.reservePercentage,
+            maximumLossesPerDay: this.profile.maximumLossesPerDay,
+            tradeInput: this.profile.tradeInput,
+          },
+        })
+        .catch((error) => console.log(error));
     },
   },
 };
