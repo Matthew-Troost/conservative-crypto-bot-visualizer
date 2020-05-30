@@ -3,7 +3,7 @@ let trading = require("./trading");
 const axios = require("axios");
 let axios_API = axios.create({
   baseURL: "https://conserv-crypto-trading-bot-api.herokuapp.com/",
-  timeout: 1000,
+  timeout: 5000,
 });
 
 // exports.test_tick = functions.https.onRequest(async () => {
