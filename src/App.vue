@@ -16,7 +16,7 @@
         <v-dialog v-model="signin_dialog" max-width="290">
           <v-card>
             <v-card-title class="headline">Access</v-card-title>
-            <v-card-text v-if="signedIn">
+            <v-card-text v-if="$store.getters.signedIn">
               Already signed in.
             </v-card-text>
             <div v-else>
@@ -90,11 +90,6 @@ export default {
       },
       { rel: "manifest", href: "/site.webmanifest" },
     ],
-  },
-  computed: {
-    signedIn() {
-      return this.$store.getters.signedIn;
-    },
   },
   methods: {
     signIn() {

@@ -54,10 +54,10 @@
           <v-tab>
             Statistics
           </v-tab>
-          <v-tab>
+          <v-tab :disabled="!$store.getters.signedIn">
             Accounts
           </v-tab>
-          <v-tab>
+          <v-tab :disabled="!$store.getters.signedIn">
             Settings
           </v-tab>
         </v-tabs>
