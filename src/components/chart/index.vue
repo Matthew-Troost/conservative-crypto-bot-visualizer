@@ -41,10 +41,7 @@ export default {
   },
   computed: {
     dataReceived() {
-      return (
-        this.pricePoints.length > 0 &&
-        this.events.length > 0
-      );
+      return this.pricePoints.length > 0 && this.events.length > 0;
     },
   },
   watch: {
@@ -52,13 +49,36 @@ export default {
       if (ready) {
         this.data.pricePoints = this.lodash
           .cloneDeep(this.pricePoints)
+          .map((point) => {
+            return {
+              createdAt: point.createdAt,
+              value: point.value,
+              margin: (
+                ((point.value - this.latestEntryPoint.value) /
+                  this.latestEntryPoint.value) *
+                100
+              ).toFixed(3),
+            };
+          })
           .reverse();
         this.data.events = this.lodash.cloneDeep(this.events).reverse();
         this.buildChart();
       }
     },
     pricePoints(value) {
-      if (this.chart) this.chart.addData(value[0], 1);
+      if (this.chart)
+        this.chart.addData(
+          {
+            createdAt: value[0].createdAt,
+            value: value[0].value,
+            margin: (
+              ((value[0].value - this.latestEntryPoint.value) /
+                this.latestEntryPoint.value) *
+              100
+            ).toFixed(3),
+          },
+          1
+        );
     },
   },
   methods: {
@@ -74,10 +94,10 @@ export default {
       };
       dateAxis.tooltipDateFormat = "HH:mm, d MMMM";
       dateAxis.renderer.grid.template.location = 0;
-      
+
       let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
       valueAxis.baseValue = 0;
-      valueAxis.renderer.grid.template.disabled = true
+      valueAxis.renderer.grid.template.disabled = true;
 
       let entryPointLine = valueAxis.axisRanges.create();
       entryPointLine.value = this.latestEntryPoint.value;
@@ -105,9 +125,16 @@ export default {
       let series_pricepoints = chart.series.push(new am4charts.LineSeries());
       series_pricepoints.dataFields.dateX = "createdAt";
       series_pricepoints.dataFields.valueY = "value";
-      series_pricepoints.tooltipText = "{valueY.value}";
       series_pricepoints.strokeWidth = 2;
       series_pricepoints.stroke = am4core.color("grey");
+      series_pricepoints.tooltipHTML = `<center><strong>{valueY.value}</strong></center>
+                                          <hr />
+                                          <table>
+                                          <tr>
+                                            <th align="left">Margin: </th>
+                                            <td>{margin}</td>
+                                          </tr>
+                                          </table>`;
 
       let ranges = [];
 
