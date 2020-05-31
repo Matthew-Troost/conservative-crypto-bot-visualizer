@@ -21,7 +21,9 @@
         <v-row class="center">
           <v-col cols="12" sm="4">
             <v-btn
+              class="quick-action__button"
               small
+              @click="confirmCommand('BUYIN')"
               :disabled="
                 !state ||
                   (state.status != 'IDLE' &&
@@ -32,7 +34,9 @@
           </v-col>
           <v-col cols="12" sm="4">
             <v-btn
+              class="quick-action__button"
               small
+              @click="confirmCommand('CASHOUT')"
               :disabled="
                 !state ||
                   (state.status != 'GAINING' &&
@@ -42,7 +46,10 @@
             >
           </v-col>
           <v-col cols="12" sm="4">
-            <v-btn small @click="test()"
+            <v-btn
+              class="quick-action__button"
+              small
+              @click="confirmCommand('PAUSE')"
               >{{
                 !state || state.status == "PAUSED" ? "Resume" : "Pause"
               }}
@@ -109,6 +116,12 @@
         <eventsStat :events="events" />
       </v-col>
     </v-row>
+    <confirm
+      :text="confirmAction.text"
+      :open="confirmAction.display"
+      @accepted="onActionConfirmed()"
+      @cancelled="confirmAction.display = false"
+    />
   </div>
 </template>
 
@@ -121,6 +134,7 @@ import profile from "../components/profile";
 import queries from "../apollo/queries.gql";
 import subscriptions from "../apollo/subscriptions.gql";
 import luno_functions from "../mixins/luno";
+import confirm from "../components/confirmAction";
 
 export default {
   components: {
@@ -129,6 +143,7 @@ export default {
     account,
     exits,
     profile,
+    confirm,
   },
   mixins: [luno_functions],
   data() {
@@ -140,6 +155,11 @@ export default {
       tab: null,
       lunoAccounts: [],
       exits: [],
+      confirmAction: {
+        display: false,
+        text: "",
+        action: "",
+      },
     };
   },
   created() {
@@ -184,6 +204,9 @@ export default {
     },
     exits: {
       query: queries.getExits,
+      variables: {
+        limit: 10,
+      },
     },
     $subscribe: {
       stateUpdated: {
@@ -224,6 +247,28 @@ export default {
         this.lunoAccounts = accounts;
       });
     },
+    confirmCommand(action) {
+      this.confirmAction.action = action;
+      switch (action) {
+        case "PAUSE":
+          this.confirmAction.text = "Pause trading?";
+          break;
+        case "CASHOUT":
+          this.confirmAction.text = "Cash out?";
+          break;
+        case "BUYIN":
+          this.confirmAction.text = "Cash out?";
+          break;
+      }
+      this.confirmAction.display = true;
+    },
+    onActionConfirmed() {
+      switch (this.confirmAction.action) {
+        case "PAUSE":
+          //set status to IDLE
+          break;
+      }
+    },
   },
 };
 </script>
@@ -234,6 +279,10 @@ export default {
 }
 .data {
   margin-top: 15px;
+}
+.quick-action__button.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: rgb(136, 136, 136) !important;
+  color: black !important;
 }
 
 .live-icon {

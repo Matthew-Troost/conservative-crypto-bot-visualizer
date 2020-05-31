@@ -8,8 +8,6 @@ async function trade(axiosInstance, latestPricePoint, profile) {
 
   switch (state.status) {
     case "IDLE":
-      if (!(await isUpwardTrend())) return;
-      await enter(latestPricePoint.id, profile);
       break;
 
     case "AWAITING_UPWARD_TREND":
@@ -135,7 +133,7 @@ async function enter(pricePointId, profile) {
     variables: {
       value: profile.tradeInput, //TODO: check if this is available in luno wallet
       pricepointId: pricePointId,
-      profileId: profile.id,
+      profileId: parseInt(profile.id),
     },
   });
 

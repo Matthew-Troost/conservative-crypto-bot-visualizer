@@ -38,8 +38,8 @@ query getProfiles {
   }
 }
 
-query getExits {
-  exits {
+query getExits($limit: Int!) {
+  exits(limit: $limit) {
     createdAt
     pricePoint {
       value
