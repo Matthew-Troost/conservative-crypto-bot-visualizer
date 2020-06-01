@@ -68,6 +68,12 @@ exports.exit = functions.https.onCall(async (data, context) => {
   return await trading.exit(data.pricePointId);
 });
 
+exports.enter = functions.https.onCall(async (data, context) => {
+  await authenticate();
+  trading.setAxiosInstance(axios_API);
+  return await trading.enter(data.pricePointId, data.profile);
+});
+
 async function authenticate() {
   const token = await getAPIAuthToken();
 

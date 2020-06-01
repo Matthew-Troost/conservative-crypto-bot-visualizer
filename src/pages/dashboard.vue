@@ -309,6 +309,23 @@ export default {
               this.$store.commit("setSnackbarDisplay", true);
             });
           break;
+        case "BUYIN":
+          var enter = functions.httpsCallable("enter");
+          enter({ pricePointId: this.pricePoints[0].id, profile: this.profiles[0] })
+            .then(() => {
+              this.$store.commit("setSnackbarText", "Successfully bought in.");
+            })
+            .catch((error) => {
+              this.$store.commit(
+                "setSnackbarText",
+                `An error occured: ${error.message}`
+              );
+            })
+            .finally(() => {
+              this.confirmAction.display = false;
+              this.$store.commit("setSnackbarDisplay", true);
+            });
+          break;
       }
     },
   },
