@@ -161,7 +161,6 @@ export default {
       this.chart = chart;
     },
     updateEvents() {
-      console.log(this.chart);
       this.chart.invalidateData();
     },
   },

@@ -136,6 +136,7 @@ import { updateStatus } from "../apollo/mutations.gql";
 import subscriptions from "../apollo/subscriptions.gql";
 import luno_functions from "../mixins/luno";
 import confirm from "../components/confirmAction";
+import { functions } from "../plugins/firebase";
 
 export default {
   components: {
@@ -219,6 +220,7 @@ export default {
       pricePointCreated: {
         query: subscriptions.onPricePointCreated,
         result({ data }) {
+          if (!data.pricePointCreated) return;
           data.pricePointCreated.pricePoint.createdAt = new Date(
             data.pricePointCreated.pricePoint.createdAt
           );
@@ -290,11 +292,23 @@ export default {
               this.$store.commit("setSnackbarDisplay", true);
             });
           break;
-          case "CASHOUT":
-             var exit = functions.httpsCallable(
-      'stripe-create_payment_intent'
-    )
-            break;
+        case "CASHOUT":
+          var exit = functions.httpsCallable("exit");
+          exit({ pricePointId: this.pricePoints[0].id })
+            .then(() => {
+              this.$store.commit("setSnackbarText", "Successfully cashed out.");
+            })
+            .catch((error) => {
+              this.$store.commit(
+                "setSnackbarText",
+                `An error occured: ${error.message}`
+              );
+            })
+            .finally(() => {
+              this.confirmAction.display = false;
+              this.$store.commit("setSnackbarDisplay", true);
+            });
+          break;
       }
     },
   },

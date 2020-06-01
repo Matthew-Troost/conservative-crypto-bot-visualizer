@@ -65,10 +65,7 @@ exports.cleanup = functions.pubsub
 exports.exit = functions.https.onCall(async (data, context) => {
   await authenticate();
   trading.setAxiosInstance(axios_API);
-
-  let pricePoint = await getLatestPricePoint();
-
-  return await trading.exit(pricePoint.id);
+  return await trading.exit(data.pricePointId);
 });
 
 async function authenticate() {

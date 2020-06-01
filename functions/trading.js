@@ -148,6 +148,9 @@ async function enter(pricePointId, profile) {
 
 //selling crypto
 async function exit(pricePointId) {
+  pricePointId =
+    typeof pricePointId === "string" ? parseInt(pricePointId) : pricePointId;
+
   await axios.post("graphql", {
     query: `mutation updateState($lastCashOut: String!) {
         updateState(lastCashOut: $lastCashOut)
