@@ -25,7 +25,8 @@
               small
               @click="confirmCommand('BUYIN')"
               :disabled="
-                !state ||
+                !$store.getters.signedIn ||
+                  !state ||
                   (state.status != 'IDLE' &&
                     state.status != 'AWAITING_UPWARD_TREND')
               "
@@ -38,7 +39,8 @@
               small
               @click="confirmCommand('CASHOUT')"
               :disabled="
-                !state ||
+                !$store.getters.signedIn ||
+                  !state ||
                   (state.status != 'GAINING' &&
                     state.status != 'GAINS_CONTINUING')
               "
@@ -50,6 +52,7 @@
               class="quick-action__button"
               small
               @click="confirmCommand('PAUSE')"
+              :disabled="!$store.getters.signedIn"
               >{{
                 !state || state.status == "PAUSED" ? "Resume" : "Pause"
               }}
@@ -311,7 +314,10 @@ export default {
           break;
         case "BUYIN":
           var enter = functions.httpsCallable("enter");
-          enter({ pricePointId: this.pricePoints[0].id, profile: this.profiles[0] })
+          enter({
+            pricePointId: this.pricePoints[0].id,
+            profile: this.profiles[0],
+          })
             .then(() => {
               this.$store.commit("setSnackbarText", "Successfully bought in.");
             })
