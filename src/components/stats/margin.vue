@@ -19,7 +19,15 @@
       >
         {{ percentage }}%
       </p>
-      <p class="right"><small>show money margin here</small></p>
+      <v-progress-linear
+        rounded
+        :class="
+          `v-progress-linear--custom__${
+            percentage == 0 ? '' : percentage > 0 ? 'green' : 'red'
+          }`
+        "
+        :value="progressBarPercentage"
+      ></v-progress-linear>
     </div>
   </div>
 </template>
@@ -35,12 +43,28 @@ export default {
       type: Object,
       default: null,
     },
+    margins: {
+      type: Object,
+      default: () => {
+        return {
+          up: 1,
+          down: 1,
+        };
+      },
+    },
   },
   computed: {
     percentage() {
       const dif =
         this.latestPricePoint.value - this.state.entryPricePoint.value;
       return ((dif / this.state.entryPricePoint.value) * 100).toFixed(3);
+    },
+    progressBarPercentage() {
+      return this.percentage == 0
+        ? 0
+        : this.percentage > 0
+        ? (this.percentage / this.margins.up) * 100
+        : ((this.percentage * -1) / this.margins.down) * 100;
     },
   },
 };

@@ -97,3 +97,13 @@ th.text-start {
 .v-application--wrap {
   min-height: 0px;
 }
+
+.v-progress-linear--custom__red .v-progress-linear__determinate,
+.v-progress-linear--custom__red .v-progress-linear__background {
+  background-color: red;
+}
+
+.v-progress-linear--custom__green .v-progress-linear__determinate,
+.v-progress-linear--custom__green .v-progress-linear__background {
+  background-color: green;
+}

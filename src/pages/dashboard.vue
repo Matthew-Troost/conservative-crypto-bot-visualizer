@@ -78,9 +78,15 @@
               <v-col cols="12" sm="6">
                 <statusStat :state="state" />
                 <marginStat
-                  v-if="state && state.status != 'AWAITING_UPWARD_TREND'"
+                  v-if="
+                    profiles && state && state.status != 'AWAITING_UPWARD_TREND'
+                  "
                   :latestPricePoint="pricePoints && pricePoints[0]"
                   :state="state"
+                  :margins="{
+                    up: profiles[0].reservePercentage,
+                    down: profiles[0].stopLimitPercentage * -1,
+                  }"
                 />
                 <reverveMonitor
                   v-if="state && state.status == 'GAINS_CONTINUING'"
