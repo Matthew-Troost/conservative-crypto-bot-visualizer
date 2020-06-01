@@ -36,9 +36,7 @@ exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
       const BTC_value = response.data.USD.buy;
 
       //2. Get auth token by signing in
-      const token = await getAPIAuthToken();
-
-      axios_API.defaults.headers["X-Token"] = token;
+      await authenticate();
 
       //3. Post BTC price to API
       const pricePoint = await createPricePoint("BTC", BTC_value);
@@ -47,8 +45,9 @@ exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
       const profiles = await getProfiles();
 
       //5. Run trading algorithm
+      trading.setAxiosInstance(axios_API);
       return profiles.forEach(
-        async (profile) => await trading.trade(axios_API, pricePoint, profile)
+        async (profile) => await trading.trade(pricePoint, profile)
       );
     })
     .catch((error) => {
@@ -59,12 +58,24 @@ exports.tick = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
 exports.cleanup = functions.pubsub
   .schedule("every 24 hours")
   .onRun(async () => {
-    const token = await getAPIAuthToken();
-
-    axios_API.defaults.headers["X-Token"] = token;
-
+    await authenticate();
     return await deleteOldPricePoints();
   });
+
+exports.exit = functions.https.onCall(async (data, context) => {
+  await authenticate();
+  trading.setAxiosInstance(axios_API);
+
+  let pricePoint = await getLatestPricePoint();
+
+  return await trading.exit(pricePoint.id);
+});
+
+async function authenticate() {
+  const token = await getAPIAuthToken();
+
+  axios_API.defaults.headers["X-Token"] = token;
+}
 
 async function getAPIAuthToken() {
   const signIn_response = await axios_API.post("graphql", {
@@ -96,6 +107,18 @@ async function getProfiles() {
   });
 
   return profiles_response.data.data.profiles;
+}
+
+async function getLatestPricePoint() {
+  const response = await axios_API.post("graphql", {
+    query: `query{
+      pricePoints(limit: 1){
+        id
+      }
+    }`,
+  });
+
+  return response.data.data.pricePoints[0];
 }
 
 async function createPricePoint(crypto, value) {

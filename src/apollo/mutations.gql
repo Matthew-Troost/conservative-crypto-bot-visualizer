@@ -1,20 +1,25 @@
 mutation signIn($login: String!, $password: String!) {
-  signIn(login: $login, password: $password){
+  signIn(login: $login, password: $password) {
     token
   }
 }
 
 mutation updateProfile(
-    $id: ID!, 
-    $stopLimitPercentage: Float, 
-    $reservePercentage: Float, 
-    $maximumLossesPerDay: Int, 
-    $tradeInput: Float) 
-    {
+  $id: ID!
+  $stopLimitPercentage: Float
+  $reservePercentage: Float
+  $maximumLossesPerDay: Int
+  $tradeInput: Float
+) {
   updateProfile(
-      id: $id, 
-      stopLimitPercentage: $stopLimitPercentage, 
-      reservePercentage: $reservePercentage, 
-      maximumLossesPerDay: $maximumLossesPerDay, 
-      tradeInput: $tradeInput)
+    id: $id
+    stopLimitPercentage: $stopLimitPercentage
+    reservePercentage: $reservePercentage
+    maximumLossesPerDay: $maximumLossesPerDay
+    tradeInput: $tradeInput
+  )
+}
+
+mutation updateStatus($status: String!) {
+  updateState(status: $status)
 }

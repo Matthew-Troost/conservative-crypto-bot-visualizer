@@ -2,8 +2,11 @@ let axios;
 let state;
 const lodash = require("lodash");
 
-async function trade(axiosInstance, latestPricePoint, profile) {
+function setAxiosInstance(axiosInstance) {
   axios = axiosInstance;
+}
+
+async function trade(latestPricePoint, profile) {
   await getCurrentState();
 
   switch (state.status) {
@@ -21,7 +24,8 @@ async function trade(axiosInstance, latestPricePoint, profile) {
         let percentage =
           100 - (latestPricePoint.value / state.entryPricePoint.value) * 100;
         let decrease = Math.round((percentage + Number.EPSILON) * 100) / 100;
-        if (decrease >= (profile.stopLimitPercentage * -1)) await exit(latestPricePoint.id);
+        if (decrease >= profile.stopLimitPercentage * -1)
+          await exit(latestPricePoint.id);
       } else {
         let percentage =
           100 - (state.entryPricePoint.value / latestPricePoint.value) * 100;
@@ -232,4 +236,4 @@ async function getLastEntry() {
   return lastEntry;
 }
 
-module.exports = { trade };
+module.exports = { setAxiosInstance, trade, exit, enter };

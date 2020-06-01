@@ -48,12 +48,19 @@
         </v-dialog>
       </v-app>
     </vue-scroll>
+    <v-snackbar v-model="snackbar.display" :timeout="2000">
+      {{ snackbar.text }}
+      <v-btn color="blue" text @click="$store.commit('setSnackbarDisplay', false)">
+        Close
+      </v-btn>
+    </v-snackbar>
   </div>
 </template>
 <script>
 import logo from "./assets/images/crypto.png";
 import luno_logo from "./assets/images/luno-logo.png";
 import { signIn } from "./apollo/mutations.gql";
+import { mapState } from "vuex";
 
 export default {
   data() {
@@ -90,6 +97,11 @@ export default {
       },
       { rel: "manifest", href: "/site.webmanifest" },
     ],
+  },
+  computed: {
+    ...mapState({
+      snackbar: (state) => state.snackbar,
+    }),
   },
   methods: {
     signIn() {

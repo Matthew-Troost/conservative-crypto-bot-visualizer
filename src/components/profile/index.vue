@@ -45,12 +45,6 @@
       </v-row>
       <v-btn small class="f-right" @click="updateProfile()">Save changes</v-btn>
     </div>
-    <v-snackbar v-model="snackbar.display" :timeout="2000">
-      {{ snackbar.text }}
-      <v-btn color="blue" text @click="snackbar.display = false">
-        Close
-      </v-btn>
-    </v-snackbar>
   </div>
 </template>
 <script>
@@ -66,10 +60,6 @@ export default {
   data() {
     return {
       profile: null,
-      snackbar: {
-        display: false,
-        text: "",
-      },
     };
   },
   mounted() {
@@ -77,14 +67,6 @@ export default {
   },
   methods: {
     updateProfile() {
-      console.log({
-        id: parseInt(this.profile.id),
-        stopLimitPercentage: this.profile.stopLimitPercentage,
-        reservePercentage: this.profile.reservePercentage,
-        maximumLossesPerDay: this.profile.maximumLossesPerDay,
-        tradeInput: this.profile.tradeInput,
-      });
-
       this.$apollo
         .mutate({
           mutation: updateProfile,
@@ -97,12 +79,19 @@ export default {
           },
         })
         .then(() => {
-          this.snackbar.text = "Settings successfully updated.";
-          this.snackbar.display = true;
+          this.$store.commit(
+            "setSnackbarText",
+            "Settings successfully updated."
+          );
         })
         .catch((error) => {
-          this.snackbar.text = `An error occured: ${error.message}`;
-          this.snackbar.display = true;
+          this.$store.commit(
+            "setSnackbarText",
+            `An error occured: ${error.message}`
+          );
+        })
+        .finally(() => {
+          this.$store.commit("setSnackbarDisplay", true);
         });
     },
   },

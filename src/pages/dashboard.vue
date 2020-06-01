@@ -132,6 +132,7 @@ import account from "../components/account";
 import exits from "../components/exits";
 import profile from "../components/profile";
 import queries from "../apollo/queries.gql";
+import { updateStatus } from "../apollo/mutations.gql";
 import subscriptions from "../apollo/subscriptions.gql";
 import luno_functions from "../mixins/luno";
 import confirm from "../components/confirmAction";
@@ -265,8 +266,35 @@ export default {
     onActionConfirmed() {
       switch (this.confirmAction.action) {
         case "PAUSE":
-          //set status to IDLE
+          this.$apollo
+            .mutate({
+              mutation: updateStatus,
+              variables: {
+                status: "IDLE",
+              },
+            })
+            .then(() => {
+              this.$store.commit(
+                "setSnackbarText",
+                "Successfully paused trading."
+              );
+            })
+            .catch((error) => {
+              this.$store.commit(
+                "setSnackbarText",
+                `An error occured: ${error.message}`
+              );
+            })
+            .finally(() => {
+              this.confirmAction.display = false;
+              this.$store.commit("setSnackbarDisplay", true);
+            });
           break;
+          case "CASHOUT":
+             var exit = functions.httpsCallable(
+      'stripe-create_payment_intent'
+    )
+            break;
       }
     },
   },

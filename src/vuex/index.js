@@ -8,6 +8,10 @@ const store = new Vuex.Store({
   state: {
     authToken: null,
     authTokenExpiry: null,
+    snackbar: {
+      display: false,
+      text: ""
+    },
   },
   getters: {
     signedIn: (state) => {
@@ -20,6 +24,12 @@ const store = new Vuex.Store({
     },
     setAuthTokenExpiry(state, value) {
       state.authTokenExpiry = value;
+    },
+    setSnackbarDisplay(state, value) {
+      state.snackbar.display = value;
+    },
+    setSnackbarText(state, value) {
+      state.snackbar.text = value;
     },
   },
   actions: {
