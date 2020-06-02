@@ -15,4 +15,4 @@ Future enhancements:
 
 - **Candlestick View.** A candlestick view of the price changes.
 
-<img src="src/assets/images/demo.gif"  />
+<img src="src/assets/images/crypto-bot.gif"  />
