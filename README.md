@@ -6,7 +6,7 @@
 <img src="src/assets/images/crypto.png" width="50" />
 </div>
 
-Currently a work in progress, this is an real-time crypto currency trading bot. Every minute, the current Bitcoin price is fetched and a decision is made (based on various limits and metrics) to make a trade.
+Currently a work in progress, this is a real-time crypto currency trading bot. Every minute, the current Bitcoin price is fetched and a decision is made (based on various limits and metrics) to make a trade.
 
 In production, the algorithm will be linked to the Luno API to enable transactions.
 
