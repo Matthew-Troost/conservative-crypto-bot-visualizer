@@ -25,14 +25,19 @@ export default {
       type: Object,
       default: null,
     },
-    profile: {
-      type: Object,
-      default: null,
+    upperLine: {
+      type: Number,
+      default: 0,
+    },
+    lowerLine: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
     return {
       chart: null,
+      valueAxis: null,
       data: {
         pricePoints: [],
         events: [],
@@ -80,6 +85,9 @@ export default {
           1
         );
     },
+    upperLine() {
+      this.addLimits();
+    },
   },
   methods: {
     buildChart() {
@@ -95,32 +103,15 @@ export default {
       dateAxis.tooltipDateFormat = "HH:mm, d MMMM";
       dateAxis.renderer.grid.template.location = 0;
 
-      let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-      valueAxis.baseValue = 0;
-      valueAxis.renderer.grid.template.disabled = true;
+      this.valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+      this.valueAxis.baseValue = 0;
+      this.valueAxis.renderer.grid.template.disabled = true;
 
-      let entryPointLine = valueAxis.axisRanges.create();
+      let entryPointLine = this.valueAxis.axisRanges.create();
       entryPointLine.value = this.latestEntryPoint.value;
       entryPointLine.grid.stroke = am4core.color("#396478");
       entryPointLine.grid.strokeWidth = 2;
       entryPointLine.grid.strokeOpacity = 0.3;
-
-      let marginLine = valueAxis.axisRanges.create();
-      marginLine.value =
-        this.latestEntryPoint.value * (this.profile.reservePercentage / 100) +
-        this.latestEntryPoint.value;
-      marginLine.grid.stroke = am4core.color("#396478");
-      marginLine.grid.strokeWidth = 1;
-      marginLine.grid.strokeOpacity = 0.3;
-
-      let exitLine = valueAxis.axisRanges.create();
-      exitLine.value =
-        this.latestEntryPoint.value -
-        this.latestEntryPoint.value *
-          ((this.profile.stopLimitPercentage / 100) * -1);
-      exitLine.grid.stroke = am4core.color("#396478");
-      exitLine.grid.strokeWidth = 1;
-      exitLine.grid.strokeOpacity = 0.3;
 
       let series_pricepoints = chart.series.push(new am4charts.LineSeries());
       series_pricepoints.dataFields.dateX = "createdAt";
@@ -159,6 +150,23 @@ export default {
       chart.cursor = new am4charts.XYCursor();
 
       this.chart = chart;
+    },
+    addLimits() {
+      let marginLine = this.valueAxis.axisRanges.create();
+      marginLine.value =
+        this.latestEntryPoint.value * (this.upperLine / 100) +
+        this.latestEntryPoint.value;
+      marginLine.grid.stroke = am4core.color("#396478");
+      marginLine.grid.strokeWidth = 1;
+      marginLine.grid.strokeOpacity = 0.3;
+
+      let exitLine = this.valueAxis.axisRanges.create();
+      exitLine.value =
+        this.latestEntryPoint.value -
+        this.latestEntryPoint.value * ((this.lowerLine / 100) * -1);
+      exitLine.grid.stroke = am4core.color("#396478");
+      exitLine.grid.strokeWidth = 1;
+      exitLine.grid.strokeOpacity = 0.3;
     },
     updateEvents() {
       this.chart.invalidateData();

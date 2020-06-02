@@ -9,11 +9,12 @@
     </div>
     <chart
       ref="chart"
-      v-if="state && profiles"
+      v-if="state"
       :pricePoints="pricePoints"
       :events="events"
       :latestEntryPoint="state.entryPricePoint"
-      :profile="profiles[0]"
+      :upperLine="profiles ? profiles[0].reservePercentage : 0"
+      :lowerLine="profiles ? profiles[0].stopLimitPercentage : 0"
     />
     <v-row class="data">
       <v-col cols="12" sm="8">
@@ -212,6 +213,9 @@ export default {
     },
     profiles: {
       query: queries.getProfiles,
+      skip() {
+        return !this.$store.getters.signedIn;
+      },
     },
     exits: {
       query: queries.getExits,
