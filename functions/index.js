@@ -105,6 +105,7 @@ async function getProfiles() {
         reservePercentage
         maximumLossesPerDay
         tradeInput
+        lunoAccountId
       }
     }`,
   });

@@ -1,6 +1,7 @@
 let axios;
 let state;
 const lodash = require("lodash");
+let luno = require("./luno");
 
 function setAxiosInstance(axiosInstance) {
   axios = axiosInstance;
@@ -121,6 +122,12 @@ async function setCurrentStatus(status) {
 async function enter(pricePointId, profile) {
   if (typeof pricePointId === "string") pricePointId = parseInt(pricePointId);
 
+  const account = await luno.getAccount(profile.lunoAccountId);
+  let tradeAmount =
+    parseFloat(account.balance) >= profile.tradeInput
+      ? profile.tradeInput
+      : parseFloat(account.balance);
+
   await axios.post("graphql", {
     query: `mutation updateState($entryPricePointId: Int!) {
         updateState(entryPricePointId: $entryPricePointId)
@@ -137,7 +144,7 @@ async function enter(pricePointId, profile) {
       }
             }`,
     variables: {
-      value: profile.tradeInput, //TODO: check if this is available in luno wallet
+      value: tradeAmount,
       pricepointId: pricePointId,
       profileId: parseInt(profile.id),
     },
