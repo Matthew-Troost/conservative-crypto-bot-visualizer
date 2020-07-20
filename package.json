@@ -21,7 +21,7 @@
     "firebase": "^7.14.3",
     "graphql": "^15.0.0",
     "graphql-tag": "^2.10.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.25.3",
     "subscriptions-transport-ws": "^0.9.16",
     "vue": "^2.6.11",
